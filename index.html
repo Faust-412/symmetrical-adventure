@@ -2,74 +2,705 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой первый сайт</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>КАЧОК 105</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FFF8F0;
+            color: #2D2D2D;
             min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .muscle-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .muscle-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .muscle-card:active {
+            transform: scale(0.95);
+            border-color: #FF8C42;
+        }
+
+        .muscle-card h3 {
+            font-size: 18px;
+            color: #2D2D2D;
+            font-weight: 600;
+        }
+
+        .exercise-list {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: background 0.5s ease;
+            gap: 15px;
         }
 
-        h1 {
-            color: white;
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        .exercise-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1);
         }
 
-        button {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            background-color: white;
-            color: #667eea;
+        .exercise-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #FFE5D0;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #FFFAF5;
+        }
+
+        .input-group input:focus {
+            border-color: #FF8C42;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
             border: none;
-            border-radius: 50px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        .btn-primary {
+            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
         }
 
-        button:active {
-            transform: translateY(0);
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #FFE5D0;
+            color: #FF6B35;
+            margin-top: 10px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #FF6B35;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #999;
+            cursor: pointer;
+            padding: 5px 20px;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: #FF6B35;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 18px;
+            color: #FF6B35;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #FFE5D0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-date {
+            font-weight: 600;
+            color: #2D2D2D;
+        }
+
+        .stat-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .arrow-up {
+            width: 20px;
+            height: 20px;
+            fill: #4CAF50;
+        }
+
+        .arrow-down {
+            width: 20px;
+            height: 20px;
+            fill: #F44336;
+        }
+
+        .positive {
+            color: #4CAF50;
+        }
+
+        .negative {
+            color: #F44336;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 400px) {
+            .muscle-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Привет, это мой первый сайт</h1>
-    <button onclick="changeBackgroundColor()">Изменить цвет фона</button>
+    <div class="header">
+        <h1>КАЧОК 105</h1>
+    </div>
+
+    <div class="notification" id="notification">Данные сохранены!</div>
+
+    <div class="container">
+        <!-- Главный экран -->
+        <div id="home-screen" class="screen active">
+            <div class="muscle-grid">
+                <div class="muscle-card" onclick="showExercises('Руки')">
+                    <h3>Руки</h3>
+                </div>
+                <div class="muscle-card" onclick="showExercises('Спина')">
+                    <h3>Спина</h3>
+                </div>
+                <div class="muscle-card" onclick="showExercises('Грудь')">
+                    <h3>Грудь</h3>
+                </div>
+                <div class="muscle-card" onclick="showExercises('Ноги')">
+                    <h3>Ноги</h3>
+                </div>
+                <div class="muscle-card" onclick="showExercises('Плечи')">
+                    <h3>Плечи</h3>
+                </div>
+                <div class="muscle-card" onclick="showExercises('Пресс')">
+                    <h3>Пресс</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран упражнений -->
+        <div id="exercises-screen" class="screen">
+            <button class="back-btn" onclick="showHome()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                Назад
+            </button>
+            <h2 id="current-muscle" style="margin: 20px 0; color: #FF6B35; font-size: 24px;"></h2>
+            <div id="exercises-list" class="exercise-list"></div>
+        </div>
+
+        <!-- Экран статистики -->
+        <div id="stats-screen" class="screen">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>История тренировок</h3>
+                    <div id="stats-history"></div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Распределение тоннажа</h3>
+                    <div class="chart-container">
+                        <canvas id="pieChart" width="250" height="250"></canvas>
+                        <div id="chart-legend" class="chart-legend"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')" id="nav-home">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span>Тренировка</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('stats')" id="nav-stats">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+            <span>Статистика</span>
+        </div>
+    </nav>
 
     <script>
-        function changeBackgroundColor() {
-            const colors = [
-                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
-            ];
-            
-            const randomIndex = Math.floor(Math.random() * colors.length);
-            document.body.style.background = colors[randomIndex];
+        const exercises = {
+            'Руки': ['Молотковые сгибания', 'Подъём штанги на бицепс', 'Подъём гантелей на бицепс', 'Французский жим', 'Разгибания на трицепс в блоке', 'Сгибания запястий'],
+            'Спина': ['Подтягивания', 'Становая тяга', 'Тяга верхнего блока', 'Тяга штанги в наклоне'],
+            'Грудь': ['Жим лёжа', 'Жим гантелей на наклонной скамье', 'Отжимания', 'Разводка гантелей'],
+            'Ноги': ['Приседания со штангой', 'Жим ногами', 'Выпады', 'Румынская тяга', 'Подъёмы на носки'],
+            'Плечи': ['Жим штанги стоя', 'Махи гантелями в стороны', 'Шраги'],
+            'Пресс': ['Скручивания', 'Подъём ног в висе', 'Планка']
+        };
+
+        const chartColors = [
+            '#FF6B35', '#FF8C42', '#FFA94D', '#FFC56B', '#FFE08A', '#FFF0A8'
+        ];
+
+        let currentMuscle = '';
+
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
         }
+
+        function getTodayDate() {
+            const now = new Date();
+            return now.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function saveData(muscle, exercise, weight, reps, sets) {
+            const today = getTodayDate();
+            const key = `workout_${today}`;
+            
+            let data = JSON.parse(localStorage.getItem(key)) || {};
+            
+            if (!data[muscle]) {
+                data[muscle] = [];
+            }
+            
+            data[muscle].push({
+                exercise: exercise,
+                weight: parseFloat(weight) || 0,
+                reps: parseInt(reps) || 0,
+                sets: parseInt(sets) || 0,
+                timestamp: new Date().getTime()
+            });
+            
+            localStorage.setItem(key, JSON.stringify(data));
+            showNotification();
+        }
+
+        function showExercises(muscle) {
+            currentMuscle = muscle;
+            document.getElementById('home-screen').classList.remove('active');
+            document.getElementById('exercises-screen').classList.add('active');
+            document.getElementById('current-muscle').textContent = muscle;
+            
+            const exercisesList = document.getElementById('exercises-list');
+            exercisesList.innerHTML = '';
+            
+            exercises[muscle].forEach(exercise => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                card.innerHTML = `
+                    <h3>${exercise}</h3>
+                    <div class="input-group">
+                        <label>Вес (кг)</label>
+                        <input type="number" id="weight-${exercise}" placeholder="0" min="0" step="0.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Повторения</label>
+                        <input type="number" id="reps-${exercise}" placeholder="0" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Подходы</label>
+                        <input type="number" id="sets-${exercise}" placeholder="0" min="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveExercise('${exercise}')">Сохранить</button>
+                `;
+                exercisesList.appendChild(card);
+            });
+        }
+
+        function saveExercise(exerciseName) {
+            const weight = document.getElementById(`weight-${exerciseName}`).value;
+            const reps = document.getElementById(`reps-${exerciseName}`).value;
+            const sets = document.getElementById(`sets-${exerciseName}`).value;
+            
+            if (!weight || !reps || !sets) {
+                alert('Заполните все поля');
+                return;
+            }
+            
+            saveData(currentMuscle, exerciseName, weight, reps, sets);
+            
+            // Очистить поля
+            document.getElementById(`weight-${exerciseName}`).value = '';
+            document.getElementById(`reps-${exerciseName}`).value = '';
+            document.getElementById(`sets-${exerciseName}`).value = '';
+        }
+
+        function showHome() {
+            document.getElementById('exercises-screen').classList.remove('active');
+            document.getElementById('home-screen').classList.add('active');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            if (tab === 'home') {
+                document.getElementById('home-screen').classList.add('active');
+                document.getElementById('nav-home').classList.add('active');
+            } else if (tab === 'stats') {
+                document.getElementById('stats-screen').classList.add('active');
+                document.getElementById('nav-stats').classList.add('active');
+                loadStats();
+            }
+        }
+
+        function calculateTonage(data) {
+            let total = 0;
+            for (const muscle in data) {
+                data[muscle].forEach(ex => {
+                    total += ex.weight * ex.reps * ex.sets;
+                });
+            }
+            return Math.round(total);
+        }
+
+        function calculateMuscleTonage(data, muscle) {
+            if (!data[muscle]) return 0;
+            let total = 0;
+            data[muscle].forEach(ex => {
+                total += ex.weight * ex.reps * ex.sets;
+            });
+            return Math.round(total);
+        }
+
+        function loadStats() {
+            const historyContainer = document.getElementById('stats-history');
+            const dates = [];
+            
+            // Собираем все даты из localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('workout_')) {
+                    const date = key.replace('workout_', '');
+                    dates.push(date);
+                }
+            }
+            
+            // Сортируем даты (новые сначала)
+            dates.sort((a, b) => {
+                const [dayA, monthA, yearA] = a.split('.').map(Number);
+                const [dayB, monthB, yearB] = b.split('.').map(Number);
+                return new Date(yearB, monthB - 1, dayB) - new Date(yearA, monthA - 1, dayA);
+            });
+            
+            if (dates.length === 0) {
+                historyContainer.innerHTML = '<div class="empty-state"><p>Нет данных о тренировках</p></div>';
+                drawPieChart({});
+                return;
+            }
+            
+            let html = '';
+            let prevTonnage = null;
+            
+            dates.forEach((date, index) => {
+                const data = JSON.parse(localStorage.getItem(`workout_${date}`));
+                const tonnage = calculateTonage(data);
+                
+                let comparison = '';
+                if (prevTonnage !== null && prevTonnage > 0) {
+                    const diff = ((tonnage - prevTonnage) / prevTonnage * 100).toFixed(1);
+                    if (diff > 0) {
+                        comparison = `
+                            <span class="positive">+${diff}%</span>
+                            <svg class="arrow-up" viewBox="0 0 24 24">
+                                <path d="M7 14l5-5 5 5z"/>
+                            </svg>
+                        `;
+                    } else if (diff < 0) {
+                        comparison = `
+                            <span class="negative">${diff}%</span>
+                            <svg class="arrow-down" viewBox="0 0 24 24">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        `;
+                    }
+                }
+                
+                html += `
+                    <div class="stat-item">
+                        <span class="stat-date">${date}</span>
+                        <div class="stat-value">
+                            <span>${tonnage} кг</span>
+                            ${comparison}
+                        </div>
+                    </div>
+                `;
+                
+                prevTonnage = tonnage;
+            });
+            
+            historyContainer.innerHTML = html;
+            
+            // Строим диаграмму для последней тренировки
+            const latestData = JSON.parse(localStorage.getItem(`workout_${dates[0]}`));
+            drawPieChart(latestData);
+        }
+
+        function drawPieChart(data) {
+            const canvas = document.getElementById('pieChart');
+            const ctx = canvas.getContext('2d');
+            const legend = document.getElementById('chart-legend');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            legend.innerHTML = '';
+            
+            const muscles = ['Руки', 'Спина', 'Грудь', 'Ноги', 'Плечи', 'Пресс'];
+            const muscleData = [];
+            
+            let total = 0;
+            muscles.forEach(muscle => {
+                const tonnage = calculateMuscleTonage(data, muscle);
+                if (tonnage > 0) {
+                    muscleData.push({ muscle, tonnage });
+                    total += tonnage;
+                }
+            });
+            
+            if (total === 0) {
+                legend.innerHTML = '<div class="empty-state"><p>Нет данных для отображения</p></div>';
+                return;
+            }
+            
+            let startAngle = 0;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+            
+            muscleData.forEach((item, index) => {
+                const sliceAngle = (item.tonnage / total) * 2 * Math.PI;
+                const percentage = ((item.tonnage / total) * 100).toFixed(1);
+                
+                // Рисуем сектор
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = chartColors[index % chartColors.length];
+                ctx.fill();
+                
+                // Рисуем текст с процентом
+                const midAngle = startAngle + sliceAngle / 2;
+                const textRadius = radius * 0.7;
+                const textX = centerX + Math.cos(midAngle) * textRadius;
+                const textY = centerY + Math.sin(midAngle) * textRadius;
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${percentage}%`, textX, textY);
+                
+                // Добавляем в легенду
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                legendItem.innerHTML = `
+                    <div class="legend-color" style="background: ${chartColors[index % chartColors.length]}"></div>
+                    <span>${item.muscle}: ${percentage}%</span>
+                `;
+                legend.appendChild(legendItem);
+                
+                startAngle += sliceAngle;
+            });
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            // Проверяем, есть ли данные
+            console.log('Приложение загружено');
+        });
     </script>
 </body>
 </html>
