@@ -58,11 +58,11 @@
         }
 
         .muscle-card {
-            background: white;
+            background: #FF6B35;
             border-radius: 20px;
             padding: 25px 15px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.15);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
             cursor: pointer;
             transition: all 0.3s ease;
             border: 2px solid transparent;
@@ -71,12 +71,15 @@
         .muscle-card:active {
             transform: scale(0.95);
             border-color: #FF8C42;
+            background: #E55A2B;
         }
 
         .muscle-card h3 {
-            font-size: 18px;
-            color: #2D2D2D;
-            font-weight: 600;
+            font-size: 20px;
+            color: white;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .exercise-list {
@@ -404,20 +407,7 @@
                 Назад
             </button>
             <h2 id="current-exercise" style="margin: 20px 0; color: #FF6B35; font-size: 24px;"></h2>
-            <div class="exercise-card">
-                <div class="input-group">
-                    <label>Вес (кг)</label>
-                    <input type="number" id="weight-input" placeholder="0" min="0" step="0.5">
-                </div>
-                <div class="input-group">
-                    <label>Повторения</label>
-                    <input type="number" id="reps-input" placeholder="0" min="1">
-                </div>
-                <div class="input-group">
-                    <label>Подходы</label>
-                    <input type="number" id="sets-input" placeholder="0" min="1">
-                </div>
-                <button class="btn btn-primary" onclick="saveCurrentExercise()">Сохранить</button>
+            <div class="exercise-card" id="exercise-form-container">
             </div>
         </div>
 
@@ -529,16 +519,68 @@
             });
         }
 
+        // Упражнения с собственным весом (без поля веса)
+        const bodyweightExercises = ['Подтягивания', 'Отжимания', 'Скручивания', 'Подъём ног в висе'];
+        
+        // Планка - только время и подходы
+        const plankExercise = 'Планка';
+
         function showExerciseInput(exerciseName) {
             currentExerciseName = exerciseName;
             document.getElementById('exercises-list-screen').classList.remove('active');
             document.getElementById('exercise-input-screen').classList.add('active');
             document.getElementById('current-exercise').textContent = exerciseName;
             
-            // Очистить поля
-            document.getElementById('weight-input').value = '';
-            document.getElementById('reps-input').value = '';
-            document.getElementById('sets-input').value = '';
+            // Генерация формы в зависимости от упражнения
+            const container = document.getElementById('exercise-form-container');
+            let html = '';
+            
+            if (exerciseName === plankExercise) {
+                // Планка: только время и подходы
+                html = `
+                    <div class="input-group">
+                        <label>Время (секунды)</label>
+                        <input type="number" id="time-input" placeholder="0" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Подходы</label>
+                        <input type="number" id="sets-input" placeholder="0" min="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveCurrentExercise()">Сохранить</button>
+                `;
+            } else if (bodyweightExercises.includes(exerciseName)) {
+                // Упражнения с собственным весом: только повторения и подходы
+                html = `
+                    <div class="input-group">
+                        <label>Повторения</label>
+                        <input type="number" id="reps-input" placeholder="0" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Подходы</label>
+                        <input type="number" id="sets-input" placeholder="0" min="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveCurrentExercise()">Сохранить</button>
+                `;
+            } else {
+                // Обычные упражнения: вес, повторения, подходы
+                html = `
+                    <div class="input-group">
+                        <label>Вес (кг)</label>
+                        <input type="number" id="weight-input" placeholder="0" min="0" step="0.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Повторения</label>
+                        <input type="number" id="reps-input" placeholder="0" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Подходы</label>
+                        <input type="number" id="sets-input" placeholder="0" min="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveCurrentExercise()">Сохранить</button>
+                `;
+            }
+            
+            container.innerHTML = html;
         }
 
         function showExercisesList() {
@@ -547,21 +589,54 @@
         }
 
         function saveCurrentExercise() {
-            const weight = document.getElementById('weight-input').value;
-            const reps = document.getElementById('reps-input').value;
-            const sets = document.getElementById('sets-input').value;
+            let weight = 0;
+            let reps = 0;
+            let sets = 0;
             
-            if (!weight || !reps || !sets) {
-                alert('Заполните все поля');
-                return;
+            if (currentExerciseName === plankExercise) {
+                // Планка: время и подходы
+                const timeInput = document.getElementById('time-input');
+                const setsInput = document.getElementById('sets-input');
+                
+                if (!timeInput.value || !setsInput.value) {
+                    alert('Заполните все поля');
+                    return;
+                }
+                
+                // Для планки используем время как "вес" для статистики
+                weight = 0;
+                reps = parseInt(timeInput.value) || 0;
+                sets = parseInt(setsInput.value) || 0;
+            } else if (bodyweightExercises.includes(currentExerciseName)) {
+                // Упражнения с собственным весом: повторения и подходы
+                const repsInput = document.getElementById('reps-input');
+                const setsInput = document.getElementById('sets-input');
+                
+                if (!repsInput.value || !setsInput.value) {
+                    alert('Заполните все поля');
+                    return;
+                }
+                
+                weight = 0;
+                reps = parseInt(repsInput.value) || 0;
+                sets = parseInt(setsInput.value) || 0;
+            } else {
+                // Обычные упражнения: вес, повторения, подходы
+                const weightInput = document.getElementById('weight-input');
+                const repsInput = document.getElementById('reps-input');
+                const setsInput = document.getElementById('sets-input');
+                
+                if (!weightInput.value || !repsInput.value || !setsInput.value) {
+                    alert('Заполните все поля');
+                    return;
+                }
+                
+                weight = parseFloat(weightInput.value) || 0;
+                reps = parseInt(repsInput.value) || 0;
+                sets = parseInt(setsInput.value) || 0;
             }
             
             saveData(currentMuscle, currentExerciseName, weight, reps, sets);
-            
-            // Очистить поля
-            document.getElementById('weight-input').value = '';
-            document.getElementById('reps-input').value = '';
-            document.getElementById('sets-input').value = '';
         }
 
         function showHome() {
