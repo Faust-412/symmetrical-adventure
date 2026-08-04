@@ -16,7 +16,8 @@
         .muscle-card { background: #1a1a1a; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; min-height: 100px; }
         .muscle-card:active { transform: scale(0.98); border-color: #FF6B35; background: #2a2a2a; }
         .muscle-card-title { font-size: 24px; color: white; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; flex: 1; }
-        .muscle-card-svg { width: 80px; height: 80px; }
+        .muscle-card-svg { width: 80px; height: 80px; object-fit: contain; }
+        .muscle-card-img { width: 80px; height: 80px; object-fit: contain; }
         .weight-section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
         .weight-section h3 { font-size: 18px; color: #FF6B35; margin-bottom: 15px; font-weight: 700; }
         .weight-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -140,27 +141,27 @@
             <div class="muscle-grid">
                 <div class="muscle-card" onclick="showExercisesList('Грудь')">
                     <span class="muscle-card-title">ГРУДЬ</span>
-                    <svg class="muscle-card-svg" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="80" rx="5" fill="#444"/><circle cx="50" cy="20" r="12" fill="#444"/><ellipse cx="35" cy="45" rx="12" ry="8" fill="#FF6B35"/><ellipse cx="65" cy="45" rx="12" ry="8" fill="#FF6B35"/></svg>
+                    <img class="muscle-card-img" src="chest.png" alt="Грудь">
                 </div>
                 <div class="muscle-card" onclick="showExercisesList('Спина')">
                     <span class="muscle-card-title">СПИНА</span>
-                    <svg class="muscle-card-svg" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="80" rx="5" fill="#444"/><circle cx="50" cy="20" r="12" fill="#444"/><ellipse cx="35" cy="50" rx="10" ry="15" fill="#FF6B35"/><ellipse cx="65" cy="50" rx="10" ry="15" fill="#FF6B35"/></svg>
+                    <img class="muscle-card-img" src="back.png" alt="Спина">
                 </div>
                 <div class="muscle-card" onclick="showExercisesList('Руки')">
                     <span class="muscle-card-title">РУКИ</span>
-                    <svg class="muscle-card-svg" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="80" rx="5" fill="#444"/><circle cx="50" cy="20" r="12" fill="#444"/><ellipse cx="28" cy="45" rx="6" ry="12" fill="#FF6B35"/><ellipse cx="72" cy="45" rx="6" ry="12" fill="#FF6B35"/></svg>
+                    <img class="muscle-card-img" src="arms.png" alt="Руки">
                 </div>
                 <div class="muscle-card" onclick="showExercisesList('Ноги')">
                     <span class="muscle-card-title">НОГИ</span>
-                    <svg class="muscle-card-svg" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="80" rx="5" fill="#444"/><circle cx="50" cy="20" r="12" fill="#444"/><rect x="32" y="55" width="14" height="30" rx="4" fill="#FF6B35"/><rect x="54" y="55" width="14" height="30" rx="4" fill="#FF6B35"/></svg>
+                    <img class="muscle-card-img" src="legs.png" alt="Ноги">
                 </div>
                 <div class="muscle-card" onclick="showExercisesList('Плечи')">
                     <span class="muscle-card-title">ПЛЕЧИ</span>
-                    <svg class="muscle-card-svg" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="80" rx="5" fill="#444"/><circle cx="50" cy="20" r="12" fill="#444"/><ellipse cx="30" cy="30" rx="10" ry="8" fill="#FF6B35"/><ellipse cx="70" cy="30" rx="10" ry="8" fill="#FF6B35"/></svg>
+                    <img class="muscle-card-img" src="shoulders.png" alt="Плечи">
                 </div>
                 <div class="muscle-card" onclick="showExercisesList('Пресс')">
                     <span class="muscle-card-title">ПРЕСС</span>
-                    <svg class="muscle-card-svg" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="80" rx="5" fill="#444"/><circle cx="50" cy="20" r="12" fill="#444"/><rect x="38" y="50" width="24" height="25" rx="3" fill="#FF6B35"/></svg>
+                    <img class="muscle-card-img" src="abs.png" alt="Пресс">
                 </div>
             </div>
         </div>
