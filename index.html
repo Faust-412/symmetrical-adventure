@@ -128,25 +128,41 @@
 
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             border: none;
             border-radius: 15px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 900;
             cursor: pointer;
             transition: all 0.3s;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35);
+            background: #FF6B35;
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
         }
 
         .btn-primary:active {
             transform: scale(0.98);
+            background: #E55A2B;
+        }
+
+        .btn-exercise {
+            background: #FF6B35;
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            padding: 20px;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-exercise:active {
+            transform: scale(0.98);
+            background: #E55A2B;
         }
 
         .btn-secondary {
@@ -367,8 +383,8 @@
             </div>
         </div>
 
-        <!-- Экран упражнений -->
-        <div id="exercises-screen" class="screen">
+        <!-- Экран списка упражнений -->
+        <div id="exercises-list-screen" class="screen">
             <button class="back-btn" onclick="showHome()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
@@ -377,6 +393,32 @@
             </button>
             <h2 id="current-muscle" style="margin: 20px 0; color: #FF6B35; font-size: 24px;"></h2>
             <div id="exercises-list" class="exercise-list"></div>
+        </div>
+
+        <!-- Экран ввода упражнения -->
+        <div id="exercise-input-screen" class="screen">
+            <button class="back-btn" onclick="showExercisesList()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                Назад
+            </button>
+            <h2 id="current-exercise" style="margin: 20px 0; color: #FF6B35; font-size: 24px;"></h2>
+            <div class="exercise-card">
+                <div class="input-group">
+                    <label>Вес (кг)</label>
+                    <input type="number" id="weight-input" placeholder="0" min="0" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label>Повторения</label>
+                    <input type="number" id="reps-input" placeholder="0" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Подходы</label>
+                    <input type="number" id="sets-input" placeholder="0" min="1">
+                </div>
+                <button class="btn btn-primary" onclick="saveCurrentExercise()">Сохранить</button>
+            </div>
         </div>
 
         <!-- Экран статистики -->
@@ -428,6 +470,7 @@
         ];
 
         let currentMuscle = '';
+        let currentExerciseName = '';
 
         function showNotification() {
             const notification = document.getElementById('notification');
@@ -471,55 +514,59 @@
         function showExercises(muscle) {
             currentMuscle = muscle;
             document.getElementById('home-screen').classList.remove('active');
-            document.getElementById('exercises-screen').classList.add('active');
+            document.getElementById('exercises-list-screen').classList.add('active');
             document.getElementById('current-muscle').textContent = muscle;
             
             const exercisesList = document.getElementById('exercises-list');
             exercisesList.innerHTML = '';
             
             exercises[muscle].forEach(exercise => {
-                const card = document.createElement('div');
-                card.className = 'exercise-card';
-                card.innerHTML = `
-                    <h3>${exercise}</h3>
-                    <div class="input-group">
-                        <label>Вес (кг)</label>
-                        <input type="number" id="weight-${exercise}" placeholder="0" min="0" step="0.5">
-                    </div>
-                    <div class="input-group">
-                        <label>Повторения</label>
-                        <input type="number" id="reps-${exercise}" placeholder="0" min="1">
-                    </div>
-                    <div class="input-group">
-                        <label>Подходы</label>
-                        <input type="number" id="sets-${exercise}" placeholder="0" min="1">
-                    </div>
-                    <button class="btn btn-primary" onclick="saveExercise('${exercise}')">Сохранить</button>
-                `;
-                exercisesList.appendChild(card);
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-exercise';
+                btn.textContent = exercise;
+                btn.onclick = () => showExerciseInput(exercise);
+                exercisesList.appendChild(btn);
             });
         }
 
-        function saveExercise(exerciseName) {
-            const weight = document.getElementById(`weight-${exerciseName}`).value;
-            const reps = document.getElementById(`reps-${exerciseName}`).value;
-            const sets = document.getElementById(`sets-${exerciseName}`).value;
+        function showExerciseInput(exerciseName) {
+            currentExerciseName = exerciseName;
+            document.getElementById('exercises-list-screen').classList.remove('active');
+            document.getElementById('exercise-input-screen').classList.add('active');
+            document.getElementById('current-exercise').textContent = exerciseName;
+            
+            // Очистить поля
+            document.getElementById('weight-input').value = '';
+            document.getElementById('reps-input').value = '';
+            document.getElementById('sets-input').value = '';
+        }
+
+        function showExercisesList() {
+            document.getElementById('exercise-input-screen').classList.remove('active');
+            document.getElementById('exercises-list-screen').classList.add('active');
+        }
+
+        function saveCurrentExercise() {
+            const weight = document.getElementById('weight-input').value;
+            const reps = document.getElementById('reps-input').value;
+            const sets = document.getElementById('sets-input').value;
             
             if (!weight || !reps || !sets) {
                 alert('Заполните все поля');
                 return;
             }
             
-            saveData(currentMuscle, exerciseName, weight, reps, sets);
+            saveData(currentMuscle, currentExerciseName, weight, reps, sets);
             
             // Очистить поля
-            document.getElementById(`weight-${exerciseName}`).value = '';
-            document.getElementById(`reps-${exerciseName}`).value = '';
-            document.getElementById(`sets-${exerciseName}`).value = '';
+            document.getElementById('weight-input').value = '';
+            document.getElementById('reps-input').value = '';
+            document.getElementById('sets-input').value = '';
         }
 
         function showHome() {
-            document.getElementById('exercises-screen').classList.remove('active');
+            document.getElementById('exercises-list-screen').classList.remove('active');
+            document.getElementById('exercise-input-screen').classList.remove('active');
             document.getElementById('home-screen').classList.add('active');
         }
 
