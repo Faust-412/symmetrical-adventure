@@ -27,12 +27,12 @@
         .weight-change { font-size: 16px; font-weight: 600; }
         .weight-change.positive { color: #4CAF50; }
         .weight-change.negative { color: #F44336; }
-        .weight-chart { margin-top: 15px; width: 100%; height: 100px; }
-        .chart-wrapper { position: relative; width: 100%; height: 100px; margin-top: 15px; }
-        .progress-chart-wrapper { position: relative; width: 100%; height: 150px; }
-        .chart-tooltip { position: absolute; background: #FF6B35; color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; pointer-events: none; z-index: 1000; white-space: nowrap; transform: translate(-50%, -120%); box-shadow: 0 2px 10px rgba(255, 107, 53, 0.4); display: none; }
+        .weight-chart-container { position: relative; margin-top: 15px; width: 100%; height: 100px; }
+        .weight-chart { width: 100%; height: 100%; }
+        .progress-chart-container { position: relative; width: 100%; height: 150px; background: white; border-radius: 15px; padding: 15px; }
+        .progress-chart { width: 100%; height: 100%; }
+        .chart-tooltip { position: absolute; background: #FF6B35; color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; pointer-events: none; transform: translate(-50%, -100%); white-space: nowrap; z-index: 1000; display: none; box-shadow: 0 2px 10px rgba(255, 107, 53, 0.4); }
         .chart-point { cursor: pointer; }
-        .chart-point-hit { fill: transparent; cursor: pointer; }
         .exercise-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .exercise-list-header h2 { color: #FF6B35; font-size: 24px; font-weight: 700; }
         .exercise-item { background: white; border-radius: 15px; padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(255, 140, 66, 0.1); transition: all 0.3s; }
@@ -132,7 +132,7 @@
                     <span class="weight-current-value" id="current-weight-value">0 кг</span>
                     <span class="weight-change" id="weight-change"></span>
                 </div>
-                <div class="chart-wrapper">
+                <div class="weight-chart-container" id="weight-chart-container">
                     <svg class="weight-chart" id="weight-chart" viewBox="0 0 300 100"></svg>
                     <div class="chart-tooltip" id="weight-tooltip"></div>
                 </div>
@@ -184,7 +184,7 @@
             </div>
             <div id="tab-history" class="tab-content"><div id="exercise-history-list"></div></div>
             <div id="tab-progress" class="tab-content">
-                <div class="progress-chart-wrapper">
+                <div class="progress-chart-container" id="progress-chart-container">
                     <svg class="progress-chart" id="progress-chart"></svg>
                     <div class="chart-tooltip" id="progress-tooltip"></div>
                 </div>
@@ -276,8 +276,64 @@
         function parseDate(s) { const p = s.split('.'); return new Date(p[2], p[1] - 1, p[0]); }
         function saveWeight() { const w = parseFloat(document.getElementById('weight-input').value); if (!w || w <= 0) return; const t = getTodayDate(); let weights = JSON.parse(localStorage.getItem('user_weights')) || []; weights.push({ weight: w, date: t, timestamp: Date.now() }); localStorage.setItem('user_weights', JSON.stringify(weights)); document.getElementById('weight-input').value = ''; updateWeightDisplay(); showNotification(); }
         function updateWeightDisplay() { let weights = JSON.parse(localStorage.getItem('user_weights')) || []; if (weights.length === 0) return; weights.sort((a, b) => b.timestamp - a.timestamp); document.getElementById('weight-current-display').style.display = 'flex'; document.getElementById('current-weight-value').textContent = weights[0].weight + ' кг'; let change = ''; if (weights.length > 1) { const d = weights[0].weight - weights[1].weight; change = (d > 0 ? '+' : '') + d.toFixed(1) + ' кг'; document.getElementById('weight-change').className = 'weight-change ' + (d > 0 ? 'positive' : d < 0 ? 'negative' : ''); } document.getElementById('weight-change').textContent = change; drawWeightChart(weights.slice(0, 10).reverse()); }
-        function drawWeightChart(w) { const svg = document.getElementById('weight-chart'); if (w.length < 2) { svg.innerHTML = ''; return; } const W = 300, H = 100, P = 10, min = Math.min(...w.map(x => x.weight)) - 1, max = Math.max(...w.map(x => x.weight)) + 1, R = max - min || 1; let pts = '', c = ''; w.forEach((x, i) => { const X = P + (i / (w.length - 1)) * (W - 2 * P), Y = H - P - ((x.weight - min) / R) * (H - 2 * P); pts += X + ',' + Y + ' '; c += '<circle cx="' + X + '" cy="' + Y + '" r="6" fill="#FF6B35" class="chart-point"/><circle cx="' + X + '" cy="' + Y + '" r="12" class="chart-point-hit" data-value="' + x.weight + '" data-date="' + x.date + '" onclick="showTooltip(event, this, \'weight-tooltip\')"/>'; }); svg.innerHTML = '<polyline points="' + pts.trim() + '" fill="none" stroke="#FF6B35" stroke-width="2"/>' + c; }
-        function showTooltip(e, el, tooltipId) { e.stopPropagation(); const tooltip = document.getElementById(tooltipId), val = el.getAttribute('data-value'), date = el.getAttribute('data-date'); tooltip.textContent = val + ' кг, ' + date; tooltip.style.display = 'block'; const wrapperRect = el.closest('.chart-wrapper, .progress-chart-wrapper').getBoundingClientRect(), isWeightChart = !!el.closest('.chart-wrapper'), chartHeight = isWeightChart ? 100 : 150, x = parseFloat(el.getAttribute('cx')) / 300 * wrapperRect.width, y = parseFloat(el.getAttribute('cy')) / chartHeight * wrapperRect.height; tooltip.style.left = x + 'px'; tooltip.style.top = y + 'px'; }
+        function drawWeightChart(w) {
+            const svg = document.getElementById('weight-chart');
+            const container = document.getElementById('weight-chart-container');
+            const tooltip = document.getElementById('weight-tooltip');
+            if (w.length < 2) { svg.innerHTML = ''; tooltip.style.display = 'none'; return; }
+            const W = 300, H = 100, P = 10, min = Math.min(...w.map(x => x.weight)) - 1, max = Math.max(...w.map(x => x.weight)) + 1, R = max - min || 1;
+            let pts = '', c = '';
+            w.forEach((x, i) => {
+                const X = P + (i / (w.length - 1)) * (W - 2 * P), Y = H - P - ((x.weight - min) / R) * (H - 2 * P);
+                pts += X + ',' + Y + ' ';
+                c += '<circle class="chart-point" cx="' + X + '" cy="' + Y + '" r="12" fill="#FF6B35" fill-opacity="0" stroke="none" data-weight="' + x.weight + '" data-date="' + x.date + '"/><circle cx="' + X + '" cy="' + Y + '" r="4" fill="#FF6B35" pointer-events="none"/>';
+            });
+            svg.innerHTML = '<polyline points="' + pts.trim() + '" fill="none" stroke="#FF6B35" stroke-width="2"/>' + c;
+            
+            // Add click handlers for weight chart
+            svg.querySelectorAll('.chart-point').forEach(point => {
+                point.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const weight = this.getAttribute('data-weight');
+                    const date = this.getAttribute('data-date');
+                    const rect = svg.getBoundingClientRect();
+                    const containerRect = container.getBoundingClientRect();
+                    const cx = parseFloat(this.getAttribute('cx'));
+                    const cy = parseFloat(this.getAttribute('cy'));
+                    
+                    // Check if this point is already active
+                    if (tooltip.style.display === 'block' && tooltip.dataset.activePoint === this.getAttribute('data-weight') + '-' + date) {
+                        tooltip.style.display = 'none';
+                        delete tooltip.dataset.activePoint;
+                        return;
+                    }
+                    
+                    // Calculate position relative to container
+                    const svgScaleX = containerRect.width / W;
+                    const svgScaleY = containerRect.height / H;
+                    const tooltipX = cx * svgScaleX;
+                    const tooltipY = cy * svgScaleY;
+                    
+                    tooltip.textContent = weight + ' кг, ' + date;
+                    tooltip.style.left = tooltipX + 'px';
+                    tooltip.style.top = tooltipY + 'px';
+                    tooltip.style.display = 'block';
+                    tooltip.dataset.activePoint = weight + '-' + date;
+                    
+                    // Boundary check
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    const containerWidth = containerRect.width;
+                    
+                    if (tooltipRect.right > containerRect.right) {
+                        tooltip.style.transform = 'translate(-100%, -100%)';
+                    } else if (tooltipRect.left < containerRect.left) {
+                        tooltip.style.transform = 'translate(0, -100%)';
+                    } else {
+                        tooltip.style.transform = 'translate(-50%, -100%)';
+                    }
+                });
+            });
+        }
         function showHome() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('home-screen').classList.add('active'); updateWeightDisplay(); }
         function getAllWorkoutData() { const d = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('workout_')) d[k.replace('workout_', '')] = JSON.parse(localStorage.getItem(k)); } return d; }
         function getLastResult(m, e) { const all = getAllWorkoutData(), recs = []; for (const dt in all) { if (all[dt][m]) all[dt][m].forEach(r => { if (r.exercise === e) recs.push({ ...r, date: dt }); }); } if (!recs.length) return null; recs.sort((a, b) => b.timestamp - a.timestamp); return recs[0]; }
@@ -296,15 +352,101 @@
         function switchTab(n) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); event.target.classList.add('active'); document.getElementById('tab-' + n).classList.add('active'); }
         function switchTabDirect(n) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if (n === 'info') { document.querySelector('.tab-btn:nth-child(1)').classList.add('active'); document.getElementById('tab-info').classList.add('active'); } else if (n === 'history') { document.querySelector('.tab-btn:nth-child(2)').classList.add('active'); document.getElementById('tab-history').classList.add('active'); } else { document.querySelector('.tab-btn:nth-child(3)').classList.add('active'); document.getElementById('tab-progress').classList.add('active'); } }
         function loadExerciseHistory(n) { const all = getAllWorkoutData(), list = document.getElementById('exercise-history-list'), recs = []; for (const dt in all) { if (all[dt][currentMuscle]) all[dt][currentMuscle].forEach(r => { if (r.exercise === n) recs.push({ ...r, date: dt }); }); } if (!recs.length) { list.innerHTML = '<div class="empty-state"><p>Нет записей</p></div>'; return; } recs.sort((a, b) => b.timestamp - a.timestamp); recs.slice(0, 10).forEach(r => { const i = document.createElement('div'); i.className = 'history-item'; i.innerHTML = '<span class="history-date">' + r.date + '</span><span class="history-result">' + formatResult(r) + '</span>'; list.appendChild(i); }); }
-        function loadProgressChart(n) { const all = getAllWorkoutData(), svg = document.getElementById('progress-chart'), recs = []; for (const dt in all) { if (all[dt][currentMuscle]) all[dt][currentMuscle].forEach(r => { if (r.exercise === n && r.weight > 0) recs.push({ date: dt, weight: r.weight, timestamp: r.timestamp }); }); } if (!recs.length) { svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#999" font-size="14">Нет данных</text>'; return; } recs.sort((a, b) => a.timestamp - b.timestamp); const W = 300, H = 150, P = 30, max = Math.max(...recs.map(r => r.weight)), min = Math.min(...recs.map(r => r.weight)) * 0.9, R = max - min || 1; let pts = '', c = ''; recs.forEach((r, i) => { const X = P + (i / (recs.length - 1 || 1)) * (W - 2 * P), Y = H - P - ((r.weight - min) / R) * (H - 2 * P); pts += X + ',' + Y + ' '; c += '<circle cx="' + X + '" cy="' + Y + '" r="6" fill="#FF6B35" class="chart-point"/><circle cx="' + X + '" cy="' + Y + '" r="12" class="chart-point-hit" data-value="' + r.weight + '" data-date="' + r.date + '" onclick="showTooltip(event, this, \'progress-tooltip\')"/>'; }); svg.innerHTML = '<defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#FF6B35;stop-opacity:0.5"/><stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0"/></linearGradient></defs><polyline points="' + pts.trim() + '" fill="none" stroke="#FF6B35" stroke-width="2"/>' + c + '<text x="' + P + '" y="20" fill="#666" font-size="10">' + max + ' кг</text><text x="' + P + '" y="' + (H - 5) + '" fill="#666" font-size="10">' + min.toFixed(0) + ' кг</text>'; }
+        function loadProgressChart(n) {
+            const all = getAllWorkoutData();
+            const svg = document.getElementById('progress-chart');
+            const container = document.getElementById('progress-chart-container');
+            const tooltip = document.getElementById('progress-tooltip');
+            const recs = [];
+            for (const dt in all) {
+                if (all[dt][currentMuscle]) {
+                    all[dt][currentMuscle].forEach(r => {
+                        if (r.exercise === n && r.weight > 0) {
+                            recs.push({ date: dt, weight: r.weight, timestamp: r.timestamp });
+                        }
+                    });
+                }
+            }
+            if (!recs.length) {
+                svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#999" font-size="14">Нет данных</text>';
+                tooltip.style.display = 'none';
+                return;
+            }
+            recs.sort((a, b) => a.timestamp - b.timestamp);
+            const W = 300, H = 150, P = 30, max = Math.max(...recs.map(r => r.weight)), min = Math.min(...recs.map(r => r.weight)) * 0.9, R = max - min || 1;
+            let pts = '', c = '';
+            recs.forEach((r, i) => {
+                const X = P + (i / (recs.length - 1 || 1)) * (W - 2 * P), Y = H - P - ((r.weight - min) / R) * (H - 2 * P);
+                pts += X + ',' + Y + ' ';
+                c += '<circle class="chart-point" cx="' + X + '" cy="' + Y + '" r="12" fill="#FF6B35" fill-opacity="0" stroke="none" data-weight="' + r.weight + '" data-date="' + r.date + '"/><circle cx="' + X + '" cy="' + Y + '" r="4" fill="#FF6B35" pointer-events="none"/>';
+            });
+            svg.innerHTML = '<defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#FF6B35;stop-opacity:0.5"/><stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0"/></linearGradient></defs><polyline points="' + pts.trim() + '" fill="none" stroke="#FF6B35" stroke-width="2"/>' + c + '<text x="' + P + '" y="20" fill="#666" font-size="10">' + max + ' кг</text><text x="' + P + '" y="' + (H - 5) + '" fill="#666" font-size="10">' + min.toFixed(0) + ' кг</text>';
+            
+            // Add click handlers for progress chart
+            svg.querySelectorAll('.chart-point').forEach(point => {
+                point.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const weight = this.getAttribute('data-weight');
+                    const date = this.getAttribute('data-date');
+                    const containerRect = container.getBoundingClientRect();
+                    const cx = parseFloat(this.getAttribute('cx'));
+                    const cy = parseFloat(this.getAttribute('cy'));
+                    
+                    // Check if this point is already active
+                    if (tooltip.style.display === 'block' && tooltip.dataset.activePoint === weight + '-' + date) {
+                        tooltip.style.display = 'none';
+                        delete tooltip.dataset.activePoint;
+                        return;
+                    }
+                    
+                    // Calculate position relative to container
+                    const svgScaleX = containerRect.width / W;
+                    const svgScaleY = containerRect.height / H;
+                    const tooltipX = cx * svgScaleX;
+                    const tooltipY = cy * svgScaleY;
+                    
+                    tooltip.textContent = weight + ' кг, ' + date;
+                    tooltip.style.left = tooltipX + 'px';
+                    tooltip.style.top = tooltipY + 'px';
+                    tooltip.style.display = 'block';
+                    tooltip.dataset.activePoint = weight + '-' + date;
+                    
+                    // Boundary check
+                    setTimeout(() => {
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        if (tooltipRect.right > containerRect.right) {
+                            tooltip.style.transform = 'translate(-100%, -100%)';
+                        } else if (tooltipRect.left < containerRect.left) {
+                            tooltip.style.transform = 'translate(0, -100%)';
+                        } else {
+                            tooltip.style.transform = 'translate(-50%, -100%)';
+                        }
+                    }, 0);
+                });
+            });
+        }
         function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); updateWeightDisplay(); } else { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } }
         function setPeriod(p) { currentPeriod = p; document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); loadStats(); }
         function loadStats() { const all = getAllWorkoutData(), dates = Object.keys(all).sort((a, b) => parseDate(b) - parseDate(a)), now = new Date(); let fd = []; if (currentPeriod === 'week') fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 7); else if (currentPeriod === '2weeks') fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 14); else fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 30); let total = 0, mt = {}; muscleNames.forEach(m => mt[m] = 0); fd.forEach(dt => { const dd = all[dt]; for (const m in dd) dd[m].forEach(r => { const v = r.weight * r.reps * r.sets; total += v; if (mt[m] !== undefined) mt[m] += v; }); }); document.getElementById('total-tonnage').textContent = (total / 1000).toFixed(1) + ' т'; document.getElementById('total-time').textContent = Math.floor(fd.length * 0.7) + ' ч'; document.getElementById('total-workouts').textContent = fd.length; const bc = document.getElementById('muscle-bars-container'); bc.innerHTML = ''; muscleNames.forEach(m => { const p = total > 0 ? ((mt[m] / total) * 100).toFixed(0) : 0, bi = document.createElement('div'); bi.className = 'muscle-bar-item'; bi.innerHTML = '<div class="muscle-bar-header"><span class="muscle-bar-name">' + m + '</span><span class="muscle-bar-percent">' + p + '%</span></div><div class="muscle-bar-track"><div class="muscle-bar-fill" style="width:' + p + '%"></div></div>'; bc.appendChild(bi); }); drawPieChart(mt); loadWorkoutHistory(fd, all); }
         function drawPieChart(mt) { const cv = document.getElementById('pieChart'), ctx = cv.getContext('2d'), cx = cv.width / 2, cy = cv.height / 2, r = Math.min(cx, cy) - 20, tot = Object.values(mt).reduce((a, b) => a + b, 0); if (tot === 0) { ctx.clearRect(0, 0, cv.width, cv.height); ctx.fillStyle = '#999'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Нет данных', cx, cy); return; } ctx.clearRect(0, 0, cv.width, cv.height); let sa = -Math.PI / 2; muscleNames.forEach((m, i) => { const v = mt[m], ang = (v / tot) * 2 * Math.PI; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, sa, sa + ang); ctx.closePath(); ctx.fillStyle = chartColors[i % chartColors.length]; ctx.fill(); if (v > 0) { const ma = sa + ang / 2, lr = r * 0.65, lx = cx + Math.cos(ma) * lr, ly = cy + Math.sin(ma) * lr, pc = ((v / tot) * 100).toFixed(0); ctx.fillStyle = '#fff'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; if (pc > 5) ctx.fillText(pc + '%', lx, ly); } sa += ang; }); const lg = document.getElementById('chart-legend'); lg.innerHTML = ''; muscleNames.forEach((m, i) => { if (mt[m] > 0) { const it = document.createElement('div'); it.className = 'legend-item'; it.innerHTML = '<div class="legend-color" style="background:' + chartColors[i % chartColors.length] + '"></div><span>' + m + '</span>'; lg.appendChild(it); } }); }
         function loadWorkoutHistory(dates, all) { const c = document.getElementById('workout-history-list'); c.innerHTML = ''; if (!dates.length) { c.innerHTML = '<div class="empty-state"><p>Нет тренировок</p></div>'; return; } let pt = null; dates.forEach(dt => { const dd = all[dt]; let ton = 0, cnt = 0; for (const m in dd) dd[m].forEach(r => { ton += r.weight * r.reps * r.sets; cnt++; }); const dob = parseDate(dt), dw = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'], dm = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'], dh = document.createElement('div'); dh.className = 'workout-date-header'; dh.textContent = dw[dob.getDay()] + ', ' + dob.getDate() + ' ' + dm[dob.getMonth()]; c.appendChild(dh); const cd = document.createElement('div'); cd.className = 'workout-card'; let ch = ''; if (pt !== null && pt > 0) { const df = ((ton - pt) / pt) * 100; if (df > 0) ch = '<div class="workout-comparison positive"><svg class="arrow-up" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg><span>+' + df.toFixed(0) + '%</span></div>'; else if (df < 0) ch = '<div class="workout-comparison negative"><svg class="arrow-down" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg><span>' + df.toFixed(0) + '%</span></div>'; } cd.innerHTML = '<div class="workout-card-header"><span class="workout-card-title">Полный сплит</span><span class="workout-card-tonnage">' + (ton / 1000).toFixed(1) + ' т</span></div><div class="workout-card-stats"><span>' + cnt + ' упражнений</span><span>~' + Math.floor(cnt * 2) + ' мин</span></div>' + ch; c.appendChild(cd); pt = ton; }); }
+        // Global click handler to hide tooltips when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('chart-point')) {
+                const weightTooltip = document.getElementById('weight-tooltip');
+                const progressTooltip = document.getElementById('progress-tooltip');
+                if (weightTooltip) {
+                    weightTooltip.style.display = 'none';
+                    delete weightTooltip.dataset.activePoint;
+                }
+                if (progressTooltip) {
+                    progressTooltip.style.display = 'none';
+                    delete progressTooltip.dataset.activePoint;
+                }
+            }
+        });
+        
         document.addEventListener('DOMContentLoaded', updateWeightDisplay);
-    function hideTooltips() { document.querySelectorAll('.chart-tooltip').forEach(t => t.style.display = 'none'); }
     </script>
-    <script>window.addEventListener('click', function(e) { if (!e.target.closest('.chart-point-hit')) { hideTooltips(); } });</script>
 </body>
 </html>
