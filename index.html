@@ -6,56 +6,56 @@
     <title>КАЧОК 105</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FFF8F0; color: #2D2D2D; min-height: 100vh; padding-bottom: 150px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FFF8F0; color: #2D2D2D; min-height: 100vh; padding-bottom: 150px; font-size: 16px; }
         .header { background: linear-gradient(135deg, #FFA500 0%, #FF8C00); color: black; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(255, 140, 66, 0.3); }
         .header h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: black; }
-        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; width: 100%; }
         .screen { display: none; }
         .screen.active { display: block; }
         .muscle-grid { display: flex; flex-direction: column; gap: 15px; }
-        .muscle-card { background: #1a1a1a; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; min-height: 100px; position: relative; overflow: hidden; }
+        .muscle-card { background: #1a1a1a; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; min-height: 100px; position: relative; }
         .muscle-card:active { transform: scale(0.98); border-color: #FF6B35; background: #2a2a2a; }
-        .muscle-card-title { font-size: 40px; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-left: 50px; width: 50%; text-align: left; align-self: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; user-select: none; }
-        .muscle-card-svg { width: 80px; height: 80px; object-fit: contain; pointer-events: none; user-select: none; }
+        .muscle-card-title { font-size: 32px; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-left: 30px; width: 55%; text-align: left; align-self: center; white-space: normal; word-wrap: break-word; line-height: 1.2; pointer-events: none; user-select: none; }
+        .muscle-card-svg { width: 80px; height: 80px; object-fit: contain; pointer-events: none; user-select: none; flex-shrink: 0; }
         .muscle-card-img { height: 100%; max-height: 120px; width: auto; object-fit: contain; pointer-events: none; user-select: none; }
         .profile-section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
         .profile-section h3 { font-size: 18px; color: #FF6B35; margin-bottom: 15px; font-weight: 700; }
         .profile-form { display: flex; flex-direction: column; gap: 15px; }
         .profile-field { display: flex; flex-direction: column; gap: 8px; }
         .profile-field label { font-size: 14px; color: #666; font-weight: 600; }
-        .profile-field input { width: 100%; padding: 15px; border: 2px solid #FFE5D0; border-radius: 12px; font-size: 18px; font-weight: 700; outline: none; background: #FFFAF5; text-align: center; }
+        .profile-field input { width: 100%; padding: 15px; border: 2px solid #FFE5D0; border-radius: 12px; font-size: 18px; font-weight: 700; outline: none; background: #FFFAF5; text-align: center; min-height: 48px; white-space: normal; }
         .profile-field input:focus { border-color: #FF8C42; }
         .gender-toggle { display: flex; background: #FFE5D0; border-radius: 12px; padding: 5px; }
-        .gender-option { flex: 1; padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s; }
+        .gender-option { flex: 1; padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s; min-height: 44px; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
         .gender-option.active { background: #FF6B35; color: white; }
-        .btn-save-profile { background: #FF6B35; color: white; font-size: 18px; font-weight: 900; padding: 15px; border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); }
+        .btn-save-profile { background: #FF6B35; color: white; font-size: 18px; font-weight: 900; padding: 15px; border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); min-height: 48px; }
         .btn-save-profile:active { transform: scale(0.98); background: #E55A2B; }
-        .rarity-badge { background: linear-gradient(135deg, #FFA500 0%, #FF8C00); color: black; padding: 15px 20px; border-radius: 15px; margin-top: 20px; margin-bottom: 90px; text-align: center; font-weight: 700; font-size: 14px; line-height: 1.4; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3); display: none; }
+        .rarity-badge { background: linear-gradient(135deg, #FFA500 0%, #FF8C00); color: black; padding: 15px 20px; border-radius: 15px; margin-top: 20px; margin-bottom: 90px; text-align: center; font-weight: 700; font-size: 16px; line-height: 1.4; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3); display: none; white-space: normal; word-wrap: break-word; }
         .rarity-badge.visible { display: block; }
         .progress-chart-container { position: relative; width: 100%; height: 450px; background: white; border-radius: 15px; padding: 15px; padding-bottom: 25px; overflow: visible; }
-        .progress-chart { width: 100%; height: 350px; }
-        .chart-value-display { text-align: center; padding: 15px; font-size: 16px; font-weight: 700; color: #FF6B35; min-height: 50px; }
+        .progress-chart { width: 100%; height: 350px; max-width: 100%; }
+        .chart-value-display { text-align: center; padding: 15px; font-size: 16px; font-weight: 700; color: #FF6B35; min-height: 50px; white-space: normal; line-height: 1.3; }
         .chart-point { cursor: pointer; }
         .exercise-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .exercise-list-header h2 { color: #FF6B35; font-size: 24px; font-weight: 700; }
         .exercise-item { background: white; border-radius: 15px; padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(255, 140, 66, 0.1); transition: all 0.3s; }
         .exercise-item:active { background: #FFF0E8; }
         .exercise-item-info { flex: 1; }
-        .exercise-item-name { font-size: 18px; font-weight: 700; color: #2D2D2D; margin-bottom: 5px; }
-        .exercise-item-last { font-size: 14px; color: #666; }
-        .exercise-item-arrow { width: 24px; height: 24px; fill: #FF6B35; }
-        .btn-start-workout { background: #FF6B35; color: white; font-size: 20px; font-weight: 900; padding: 20px; text-align: center; border-radius: 15px; border: none; width: 100%; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .exercise-item-name { font-size: 18px; font-weight: 700; color: #2D2D2D; margin-bottom: 5px; white-space: normal; line-height: 1.3; }
+        .exercise-item-last { font-size: 14px; color: #666; white-space: normal; line-height: 1.3; }
+        .exercise-item-arrow { width: 24px; height: 24px; fill: #FF6B35; flex-shrink: 0; }
+        .btn-start-workout { background: #FF6B35; color: white; font-size: 20px; font-weight: 900; padding: 20px; text-align: center; border-radius: 15px; border: none; width: 100%; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); cursor: pointer; text-transform: uppercase; letter-spacing: 1px; min-height: 52px; }
         .btn-start-workout:active { transform: scale(0.98); background: #E55A2B; }
         .exercise-detail-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #FFE5D0; padding-bottom: 10px; }
-        .tab-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 16px; font-weight: 700; color: #999; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 16px; font-weight: 700; color: #999; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; min-height: 44px; white-space: nowrap; }
         .tab-btn.active { color: #FF6B35; border-bottom-color: #FF6B35; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .info-text { font-size: 16px; line-height: 1.6; color: #2D2D2D; padding: 15px; background: white; border-radius: 15px; margin-bottom: 20px; }
         .history-item { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .history-date { font-weight: 600; color: #666; }
-        .history-result { font-weight: 700; color: #FF6B35; }
-        .history-delete-btn { background: none; border: none; font-size: 30px; cursor: pointer; padding: 5px; margin-left: 10px; opacity: 0.6; transition: all 0.2s; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+        .history-date { font-weight: 600; color: #666; white-space: normal; line-height: 1.3; }
+        .history-result { font-weight: 700; color: #FF6B35; white-space: normal; line-height: 1.3; text-align: right; }
+        .history-delete-btn { background: none; border: none; font-size: 30px; cursor: pointer; padding: 5px; margin-left: 10px; opacity: 0.6; transition: all 0.2s; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .history-delete-btn:active { opacity: 1; transform: scale(0.9); }
         .history-item.deleting { transition: all 0.2s ease-out; opacity: 0; transform: translateX(-100%); max-height: 0; margin: 0; padding: 0; overflow: hidden; }
         .confirm-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 4000; }
@@ -63,37 +63,38 @@
         .confirm-dialog { background: white; border-radius: 20px; padding: 30px; text-align: center; max-width: 300px; width: 90%; }
         .confirm-message { font-size: 18px; font-weight: 700; color: #2D2D2D; margin-bottom: 25px; }
         .confirm-buttons { display: flex; gap: 15px; }
-        .confirm-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .confirm-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; min-height: 48px; }
         .confirm-btn-yes { background: #FF6B35; color: white; }
         .confirm-btn-no { background: #FFE5D0; color: #666; }
         .input-form { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 600; }
-        .input-group input { width: 100%; padding: 15px; border: 2px solid #FFE5D0; border-radius: 12px; font-size: 18px; font-weight: 700; outline: none; background: #FFFAF5; text-align: center; }
+        .input-group input { width: 100%; padding: 15px; border: 2px solid #FFE5D0; border-radius: 12px; font-size: 18px; font-weight: 700; outline: none; background: #FFFAF5; text-align: center; min-height: 48px; white-space: normal; }
         .input-group input:focus { border-color: #FF8C42; }
-        .btn { width: 100%; padding: 18px; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-primary { background: #FF6B35; color: white; font-size: 22px; font-weight: 900; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); }
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; min-height: 52px; }
+        .btn-primary { background: #FF6B35; color: white; font-size: 22px; font-weight: 900; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); min-height: 52px; }
         .btn-primary:active { transform: scale(0.98); background: #E55A2B; }
         .back-btn { background: none; border: none; color: #FF6B35; font-size: 16px; font-weight: 700; cursor: pointer; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
         .rest-timer-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 3000; }
         .rest-timer-overlay.active { display: flex; }
         .rest-timer-display { font-size: 80px; font-weight: 900; color: #FF6B35; margin-bottom: 30px; }
         .rest-timer-label { font-size: 24px; color: white; margin-bottom: 40px; font-weight: 700; }
-        .btn-skip-rest { background: white; color: #FF6B35; font-size: 20px; font-weight: 900; padding: 20px 40px; border-radius: 15px; border: none; cursor: pointer; text-transform: uppercase; }
+        .btn-skip-rest { background: white; color: #FF6B35; font-size: 20px; font-weight: 900; padding: 20px 40px; border-radius: 15px; border: none; cursor: pointer; text-transform: uppercase; min-height: 52px; }
         .timer-choice-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 3001; }
         .timer-choice-overlay.active { display: flex; }
-        .timer-choice-title { font-size: 24px; color: white; margin-bottom: 30px; font-weight: 700; text-align: center; }
+        .timer-choice-title { font-size: 24px; color: white; margin-bottom: 30px; font-weight: 700; text-align: center; padding: 0 20px; line-height: 1.3; }
         .timer-choice-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 20px; }
-        .btn-timer-choice { background: #FF6B35; color: white; font-size: 20px; font-weight: 900; padding: 20px; border-radius: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); }
+        .btn-timer-choice { background: #FF6B35; color: white; font-size: 20px; font-weight: 900; padding: 20px; border-radius: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); min-height: 52px; }
         .btn-timer-choice:active { transform: scale(0.98); background: #E55A2B; }
         .btn-timer-choice.secondary { background: white; color: #FF6B35; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #999; cursor: pointer; padding: 5px 20px; transition: color 0.3s; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1); z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 0); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #999; cursor: pointer; padding: 10px 20px; transition: color 0.3s; min-height: 44px; }
         .nav-item.active { color: #FF6B35; }
         .nav-icon { width: 24px; height: 24px; fill: currentColor; }
+        .nav-item span { font-size: 12px; font-weight: 600; white-space: normal; text-align: center; line-height: 1.2; }
         .stats-container { display: flex; flex-direction: column; gap: 20px; }
         .period-switcher { display: flex; background: white; border-radius: 15px; padding: 5px; margin-bottom: 20px; }
-        .period-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; border-radius: 10px; transition: all 0.3s; }
+        .period-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; border-radius: 10px; transition: all 0.3s; min-height: 44px; white-space: nowrap; }
         .period-btn.active { background: #FF6B35; color: white; }
         .stats-summary { background: linear-gradient(135deg, #FF8C42 0%, #FF6B35); border-radius: 20px; padding: 25px; color: white; margin-bottom: 20px; }
         .stats-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; }
@@ -115,21 +116,32 @@
         .legend-color { width: 16px; height: 16px; border-radius: 4px; }
         .workout-history { background: white; border-radius: 20px; padding: 20px; }
         .workout-history h3 { font-size: 18px; color: #FF6B35; margin-bottom: 15px; font-weight: 700; }
-        .workout-date-header { font-size: 16px; font-weight: 700; color: #666; margin: 20px 0 10px; text-transform: capitalize; }
+        .workout-date-header { font-size: 16px; font-weight: 700; color: #666; margin: 20px 0 10px; text-transform: capitalize; white-space: normal; line-height: 1.3; }
         .workout-card { background: #FFF8F0; border-radius: 15px; padding: 15px; margin-bottom: 10px; }
-        .workout-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .workout-card-title { font-weight: 700; color: #2D2D2D; }
-        .workout-card-stats { display: flex; gap: 20px; font-size: 14px; color: #666; }
-        .workout-card-tonnage { font-weight: 700; color: #FF6B35; }
+        .workout-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 5px; }
+        .workout-card-title { font-weight: 700; color: #2D2D2D; white-space: normal; line-height: 1.3; }
+        .workout-card-stats { display: flex; gap: 15px; font-size: 14px; color: #666; flex-wrap: wrap; }
+        .workout-card-tonnage { font-weight: 700; color: #FF6B35; white-space: nowrap; }
         .workout-comparison { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #FFE5D0; }
         .arrow-up { width: 20px; height: 20px; fill: #4CAF50; }
         .arrow-down { width: 20px; height: 20px; fill: #F44336; }
         .positive { color: #4CAF50; }
         .negative { color: #F44336; }
         .empty-state { text-align: center; padding: 40px 20px; color: #999; }
-        .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #4CAF50; color: white; padding: 15px 30px; border-radius: 25px; font-weight: 700; box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4); transition: transform 0.3s ease; z-index: 2000; }
-        .notification.show { transform: translateX(-50%) translateY(0); }
-        @media (max-width: 400px) { .header h1 { font-size: 20px; } .muscle-card-title { font-size: 20px; } .muscle-card-svg { width: 60px; height: 60px; } }
+        .notification { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #4CAF50; color: white; padding: 15px 30px; border-radius: 25px; font-weight: 700; box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4); transition: transform 0.3s ease, opacity 0.3s ease; z-index: 2000; opacity: 0; }
+        .notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        @media (max-width: 400px) { 
+            .header h1 { font-size: 20px; } 
+            .muscle-card-title { font-size: 24px; margin-left: 20px; width: 60%; } 
+            .muscle-card-svg { width: 60px; height: 60px; }
+            .container { padding: 15px; }
+            .profile-field input { font-size: 16px; padding: 12px; }
+            .btn-save-profile, .btn-start-workout, .btn { min-height: 48px; }
+            .nav-item { padding: 10px 15px; min-height: 44px; }
+            .exercise-item-name { font-size: 16px; }
+            .history-item { padding: 12px; }
+            .rarity-badge { font-size: 14px; padding: 12px 15px; }
+        }
     </style>
 </head>
 <body>
