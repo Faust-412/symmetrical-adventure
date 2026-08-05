@@ -293,11 +293,15 @@
             <div class="emotions-container">
                 <div class="emotions-title">Как прошла тренировка? Оцени от 1 до 5</div>
                 <div class="stars-container">
-                    <button class="star-btn" onclick="selectStar(1)"><svg class="star-icon" id="star-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(2)"><svg class="star-icon" id="star-2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(3)"><svg class="star-icon" id="star-3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(4)"><svg class="star-icon" id="star-4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(5)"><svg class="star-icon" id="star-5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(1)" id="star-btn-1"><svg class="star-icon" id="star-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(2)" id="star-btn-2"><svg class="star-icon" id="star-2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(3)" id="star-btn-3"><svg class="star-icon" id="star-3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(4)" id="star-btn-4"><svg class="star-icon" id="star-4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(5)" id="star-btn-5"><svg class="star-icon" id="star-5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                </div>
+                <div id="average-rating-block" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #FFE5D0;">
+                    <div style="font-size: 18px; color: #666; margin-bottom: 10px;">Средняя оценка:</div>
+                    <div id="average-rating-value" style="font-size: 48px; font-weight: 900; color: #FF6B35;">-</div>
                 </div>
             </div>
         </div>
@@ -442,7 +446,7 @@
                 });
             });
         }
-        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else if (t === 'stats') { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } else if (t === 'emotions') { document.getElementById('nav-emotions').classList.add('active'); document.getElementById('emotions-screen').classList.add('active'); resetStars(); } }
+        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else if (t === 'stats') { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } else if (t === 'emotions') { document.getElementById('nav-emotions').classList.add('active'); document.getElementById('emotions-screen').classList.add('active'); loadEmotionsScreen(); } }
         function setGender(g) { currentGender = g; document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('active')); document.getElementById('gender-' + g).classList.add('active'); updateRarityBadge(); }
         function loadProfile() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; currentGender = profile.gender || 'male'; document.getElementById('profile-age').value = profile.age || ''; document.getElementById('profile-height').value = profile.height || ''; document.getElementById('profile-weight').value = profile.weight || ''; setGender(currentGender); updateRarityBadge(); }
         function saveProfile() { let profile = { gender: currentGender, age: document.getElementById('profile-age').value, height: document.getElementById('profile-height').value, weight: document.getElementById('profile-weight').value }; localStorage.setItem('user_profile', JSON.stringify(profile)); showNotification(); if (profile.weight) { saveWeight(); } updateRarityBadge(); }
@@ -579,7 +583,79 @@
             5: 'Восхитительно! Ты выложился на полную! Это была мощная тренировка, так держать чемпион!'
         };
         
+        function getTodayDateString() {
+            const now = new Date();
+            return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+        }
+        
+        function calculateAverageRating() {
+            let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
+            if (emotions.length === 0) {
+                document.getElementById('average-rating-value').textContent = '-';
+                return;
+            }
+            
+            const today = getTodayDateString();
+            const dailyRatings = {};
+            
+            emotions.forEach(function(entry) {
+                const entryDate = entry.date.substring(0, 10);
+                if (!dailyRatings[entryDate]) {
+                    dailyRatings[entryDate] = entry.rating;
+                }
+            });
+            
+            const dates = Object.keys(dailyRatings);
+            const sum = dates.reduce(function(acc, date) {
+                return acc + dailyRatings[date];
+            }, 0);
+            
+            const avg = sum / dates.length;
+            document.getElementById('average-rating-value').textContent = avg.toFixed(1).replace('.', ',');
+        }
+        
+        function loadEmotionsScreen() {
+            const today = getTodayDateString();
+            let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
+            
+            for (let i = 0; i < emotions.length; i++) {
+                const entry = emotions[i];
+                const entryDate = entry.date.substring(0, 10);
+                if (entryDate === today) {
+                    const rating = entry.rating;
+                    for (let j = 1; j <= 5; j++) {
+                        const star = document.getElementById('star-' + j);
+                        if (j <= rating) {
+                            star.classList.add('filled');
+                        } else {
+                            star.classList.remove('filled');
+                        }
+                    }
+                    
+                    for (let k = 1; k <= 5; k++) {
+                        const btn = document.getElementById('star-btn-' + k);
+                        btn.style.pointerEvents = 'none';
+                        btn.style.cursor = 'default';
+                    }
+                    break;
+                }
+            }
+            
+            calculateAverageRating();
+        }
+        
         function selectStar(rating) {
+            const today = getTodayDateString();
+            let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
+            
+            for (let i = 0; i < emotions.length; i++) {
+                const entry = emotions[i];
+                const entryDate = entry.date.substring(0, 10);
+                if (entryDate === today) {
+                    return;
+                }
+            }
+            
             for (let i = 1; i <= 5; i++) {
                 const star = document.getElementById('star-' + i);
                 if (i <= rating) {
@@ -597,9 +673,16 @@
             const dateStr = now.toISOString();
             const entry = { rating: rating, date: dateStr };
             
-            let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
             emotions.push(entry);
             localStorage.setItem('emotions_history', JSON.stringify(emotions));
+            
+            for (let k = 1; k <= 5; k++) {
+                const btn = document.getElementById('star-btn-' + k);
+                btn.style.pointerEvents = 'none';
+                btn.style.cursor = 'default';
+            }
+            
+            calculateAverageRating();
         }
         
         function closeEmotionModal() {
@@ -609,7 +692,11 @@
         function resetStars() {
             for (let i = 1; i <= 5; i++) {
                 document.getElementById('star-' + i).classList.remove('filled');
+                const btn = document.getElementById('star-btn-' + i);
+                btn.style.pointerEvents = 'auto';
+                btn.style.cursor = 'pointer';
             }
+            loadEmotionsScreen();
         }
         
         document.addEventListener('DOMContentLoaded', function() { loadProfile(); });
