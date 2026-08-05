@@ -18,15 +18,6 @@
         .muscle-card-title { font-size: 24px; color: white; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; flex: 1; }
         .muscle-card-svg { width: 80px; height: 80px; object-fit: contain; }
         .muscle-card-img { height: 100%; max-height: 120px; width: auto; object-fit: contain; }
-        .weight-section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
-        .weight-section h3 { font-size: 18px; color: #FF6B35; margin-bottom: 15px; font-weight: 700; }
-        .weight-current { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-        .weight-current-value { font-size: 20px; font-weight: 700; color: #2D2D2D; }
-        .weight-change { font-size: 16px; font-weight: 600; }
-        .weight-change.positive { color: #4CAF50; }
-        .weight-change.negative { color: #F44336; }
-        .weight-chart-container { position: relative; margin-top: 15px; width: 100%; height: 100px; }
-        .weight-chart { width: 100%; height: 100%; }
         .profile-section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
         .profile-section h3 { font-size: 18px; color: #FF6B35; margin-bottom: 15px; font-weight: 700; }
         .profile-form { display: flex; flex-direction: column; gap: 15px; }
@@ -132,17 +123,6 @@
     </div>
     <div class="container">
         <div id="home-screen" class="screen active">
-            <div class="weight-section">
-                <h3>МОЙ ВЕС</h3>
-                <div class="weight-current" id="weight-current-display" style="display: none;">
-                    <span class="weight-current-value" id="current-weight-value">0 кг</span>
-                    <span class="weight-change" id="weight-change"></span>
-                </div>
-                <div class="weight-chart-container" id="weight-chart-container">
-                    <svg class="weight-chart" id="weight-chart" viewBox="0 0 300 100"></svg>
-                    <div class="chart-tooltip" id="weight-tooltip"></div>
-                </div>
-            </div>
             <div class="muscle-grid">
                 <div class="muscle-card" onclick="showExercisesList('Грудь')">
                     <span class="muscle-card-title">ГРУДЬ</span>
@@ -260,7 +240,7 @@
         </div>
         <div class="nav-item" onclick="switchTabNav('stats')" id="nav-stats">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-            <span>Статистика</span>
+            <span>Прогресс</span>
         </div>
     </nav>
     <script>
@@ -311,83 +291,9 @@
         function showNotification() { const n = document.getElementById('notification'); n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 2000); }
         function getTodayDate() { return new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
         function parseDate(s) { const p = s.split('.'); return new Date(p[2], p[1] - 1, p[0]); }
-        function saveWeight() { const w = parseFloat(document.getElementById('profile-weight').value); if (!w || w <= 0) return; const t = getTodayDate(); let weights = JSON.parse(localStorage.getItem('user_weights')) || []; weights.push({ weight: w, date: t, timestamp: Date.now() }); localStorage.setItem('user_weights', JSON.stringify(weights)); showNotification(); updateWeightDisplay(); }
-        function updateWeightDisplay() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; let currentWeight = profile.weight ? parseFloat(profile.weight) : null; let weights = JSON.parse(localStorage.getItem('user_weights')) || []; if (currentWeight) { document.getElementById('weight-current-display').style.display = 'flex'; document.getElementById('current-weight-value').textContent = currentWeight + ' кг'; let change = ''; if (weights.length > 0) { const lastWeight = weights[weights.length - 1].weight; const d = currentWeight - lastWeight; if (d !== 0) { change = (d > 0 ? '+' : '') + d.toFixed(1) + ' кг'; document.getElementById('weight-change').className = 'weight-change ' + (d > 0 ? 'positive' : d < 0 ? 'negative' : ''); } } document.getElementById('weight-change').textContent = change; let chartWeights = weights.slice(-9); chartWeights.push({ weight: currentWeight, date: t }); drawWeightChart(chartWeights); } else { document.getElementById('weight-current-display').style.display = 'none'; } }
-        function drawWeightChart(w) {
-            const svg = document.getElementById('weight-chart');
-            const container = document.getElementById('weight-chart-container');
-            const tooltip = document.getElementById('weight-tooltip');
-            if (w.length < 2) { svg.innerHTML = ''; tooltip.style.display = 'none'; return; }
-            const W = 300, H = 100, P = 10, min = Math.min(...w.map(x => x.weight)) - 1, max = Math.max(...w.map(x => x.weight)) + 1, R = max - min || 1;
-            let pts = '', c = '';
-            w.forEach((x, i) => {
-                const X = P + (i / (w.length - 1)) * (W - 2 * P), Y = H - P - ((x.weight - min) / R) * (H - 2 * P);
-                pts += X + ',' + Y + ' ';
-                c += '<circle class="chart-point" cx="' + X + '" cy="' + Y + '" r="12" fill="#FF6B35" fill-opacity="0" stroke="none" data-weight="' + x.weight + '" data-date="' + x.date + '"/><circle cx="' + X + '" cy="' + Y + '" r="4" fill="#FF6B35" pointer-events="none"/>';
-            });
-            svg.innerHTML = '<polyline points="' + pts.trim() + '" fill="none" stroke="#FF6B35" stroke-width="2"/>' + c;
-            
-            // Add click handlers for weight chart
-            svg.querySelectorAll('.chart-point').forEach(point => {
-                point.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const weight = this.getAttribute('data-weight');
-                    const date = this.getAttribute('data-date');
-                    const cx = parseFloat(this.getAttribute('cx'));
-                    const cy = parseFloat(this.getAttribute('cy'));
-                    
-                    // Check if this point is already active
-                    if (tooltip.style.display === 'block' && tooltip.dataset.activePoint === this.getAttribute('data-weight') + '-' + date) {
-                        tooltip.style.display = 'none';
-                        delete tooltip.dataset.activePoint;
-                        return;
-                    }
-                    
-                    // Calculate position in SVG coordinates, then convert to container percentage
-                    const containerWidth = container.clientWidth;
-                    const containerHeight = container.clientHeight;
-                    const scaleX = containerWidth / W;
-                    const scaleY = containerHeight / H;
-                    
-                    // Position tooltip above the point in container coordinates
-                    const tooltipXPercent = (cx / W) * 100;
-                    const tooltipYPercent = (cy / H) * 100;
-                    
-                    tooltip.textContent = weight + ' кг, ' + date;
-                    tooltip.style.left = tooltipXPercent + '%';
-                    tooltip.style.top = tooltipYPercent + '%';
-                    tooltip.style.transform = 'translate(-50%, -100%)';
-                    tooltip.style.display = 'block';
-                    tooltip.dataset.activePoint = weight + '-' + date;
-                    
-                    // Boundary check - adjust position if tooltip overflows
-                    setTimeout(() => {
-                        const tooltipRect = tooltip.getBoundingClientRect();
-                        const containerRect = container.getBoundingClientRect();
-                        const tooltipWidth = tooltipRect.width;
-                        const tooltipHeight = tooltipRect.height;
-                        
-                        // Calculate overflow in pixels
-                        const overflowLeft = containerRect.left - (tooltipRect.left);
-                        const overflowRight = tooltipRect.right - containerRect.right;
-                        
-                        // Adjust transform based on overflow
-                        if (overflowRight > 0) {
-                            // Tooltip goes beyond right edge - shift left
-                            const shiftPercent = (overflowRight / containerWidth) * 100;
-                            tooltip.style.transform = 'translate(calc(-50% - ' + shiftPercent + '%), -100%)';
-                        } else if (overflowLeft > 0) {
-                            // Tooltip goes beyond left edge - shift right
-                            const shiftPercent = (overflowLeft / containerWidth) * 100;
-                            tooltip.style.transform = 'translate(calc(-50% + ' + shiftPercent + '%), -100%)';
-                        } else {
-                            tooltip.style.transform = 'translate(-50%, -100%)';
-                        }
-                    }, 0);
-                });
-            });
-        }
-        function showHome() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('home-screen').classList.add('active'); updateWeightDisplay(); }
+        function saveWeight() { const w = parseFloat(document.getElementById('profile-weight').value); if (!w || w <= 0) return; const t = getTodayDate(); let weights = JSON.parse(localStorage.getItem('user_weights')) || []; weights.push({ weight: w, date: t, timestamp: Date.now() }); localStorage.setItem('user_weights', JSON.stringify(weights)); showNotification(); }
+        function updateWeightDisplay() { }
+        function showHome() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('home-screen').classList.add('active'); }
         function getAllWorkoutData() { const d = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('workout_')) d[k.replace('workout_', '')] = JSON.parse(localStorage.getItem(k)); } return d; }
         function getLastResult(m, e) { const all = getAllWorkoutData(), recs = []; for (const dt in all) { if (all[dt][m]) all[dt][m].forEach(r => { if (r.exercise === e) recs.push({ ...r, date: dt }); }); } if (!recs.length) return null; recs.sort((a, b) => b.timestamp - a.timestamp); return recs[0]; }
         function formatResult(r) { if (r.exercise === plankExercise) return r.reps + ' сек x ' + r.sets; if (bodyweightExercises.includes(r.exercise)) return r.sets + ' x ' + r.reps; return r.sets + ' x ' + r.reps + ' x ' + r.weight + ' кг'; }
@@ -491,7 +397,7 @@
                 });
             });
         }
-        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); updateWeightDisplay(); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } }
+        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } }
         function setGender(g) { currentGender = g; document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('active')); document.getElementById('gender-' + g).classList.add('active'); }
         function loadProfile() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; currentGender = profile.gender || 'male'; document.getElementById('profile-age').value = profile.age || ''; document.getElementById('profile-height').value = profile.height || ''; document.getElementById('profile-weight').value = profile.weight || ''; setGender(currentGender); }
         function saveProfile() { let profile = { gender: currentGender, age: document.getElementById('profile-age').value, height: document.getElementById('profile-height').value, weight: document.getElementById('profile-weight').value }; localStorage.setItem('user_profile', JSON.stringify(profile)); showNotification(); if (profile.weight) { saveWeight(); } }
@@ -502,12 +408,7 @@
         // Global click handler to hide tooltips when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.classList.contains('chart-point')) {
-                const weightTooltip = document.getElementById('weight-tooltip');
                 const progressTooltip = document.getElementById('progress-tooltip');
-                if (weightTooltip) {
-                    weightTooltip.style.display = 'none';
-                    delete weightTooltip.dataset.activePoint;
-                }
                 if (progressTooltip) {
                     progressTooltip.style.display = 'none';
                     delete progressTooltip.dataset.activePoint;
@@ -515,7 +416,7 @@
             }
         });
         
-        document.addEventListener('DOMContentLoaded', function() { loadProfile(); updateWeightDisplay(); });
+        document.addEventListener('DOMContentLoaded', function() { loadProfile(); });
     </script>
 </body>
 </html>
