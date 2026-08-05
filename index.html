@@ -55,6 +55,7 @@
         .history-result { font-weight: 700; color: #FF6B35; }
         .history-delete-btn { background: none; border: none; font-size: 30px; cursor: pointer; padding: 5px; margin-left: 10px; opacity: 0.6; transition: all 0.2s; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
         .history-delete-btn:active { opacity: 1; transform: scale(0.9); }
+        .history-item.deleting { transition: all 0.2s ease-out; opacity: 0; transform: translateX(-100%); max-height: 0; margin: 0; padding: 0; overflow: hidden; }
         .confirm-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 4000; }
         .confirm-overlay.active { display: flex; }
         .confirm-dialog { background: white; border-radius: 20px; padding: 30px; text-align: center; max-width: 300px; width: 90%; }
@@ -345,7 +346,7 @@
         function showExercisesListFromDetail() { document.getElementById('exercise-detail-screen').classList.remove('active'); document.getElementById('exercises-list-screen').classList.add('active'); }
         function switchTab(n) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); event.target.classList.add('active'); document.getElementById('tab-' + n).classList.add('active'); }
         function switchTabDirect(n) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if (n === 'info') { document.querySelector('.tab-btn:nth-child(1)').classList.add('active'); document.getElementById('tab-info').classList.add('active'); } else if (n === 'history') { document.querySelector('.tab-btn:nth-child(2)').classList.add('active'); document.getElementById('tab-history').classList.add('active'); } else { document.querySelector('.tab-btn:nth-child(3)').classList.add('active'); document.getElementById('tab-progress').classList.add('active'); } }
-        function loadExerciseHistory(n) { const all = getAllWorkoutData(), list = document.getElementById('exercise-history-list'); list.innerHTML = ''; const recs = []; for (const dt in all) { if (all[dt][currentMuscle]) all[dt][currentMuscle].forEach(r => { if (r.exercise === n) recs.push({ ...r, date: dt }); }); } if (!recs.length) { list.innerHTML = '<div class="empty-state"><p>Нет записей</p></div>'; return; } recs.sort((a, b) => b.timestamp - a.timestamp); recs.slice(0, 10).forEach(r => { const i = document.createElement('div'); i.className = 'history-item'; i.innerHTML = '<span class="history-date">' + r.date + '</span><span class="history-result">' + formatResult(r) + '</span><button class="history-delete-btn" onclick="deleteHistoryItem(this,\'' + r.date + '\',\'' + r.exercise.replace(/\x27/g, "\\\x27") + '\',\'' + currentMuscle + '\')">🗑</button>'; list.appendChild(i); }); }
+        function loadExerciseHistory(n) { const all = getAllWorkoutData(), list = document.getElementById('exercise-history-list'); list.innerHTML = ''; const recs = []; for (const dt in all) { if (all[dt][currentMuscle]) all[dt][currentMuscle].forEach(r => { if (r.exercise === n) recs.push({ ...r, date: dt }); }); } if (!recs.length) { list.innerHTML = '<div class="empty-state"><p>Нет записей</p></div>'; return; } recs.sort((a, b) => b.timestamp - a.timestamp); recs.slice(0, 10).forEach(r => { const i = document.createElement('div'); i.className = 'history-item'; i.setAttribute('data-timestamp', r.timestamp); i.innerHTML = '<span class="history-date">' + r.date + '</span><span class="history-result">' + formatResult(r) + '</span><button class="history-delete-btn" onclick="deleteHistoryItem(this,' + r.timestamp + ')">🗑</button>'; list.appendChild(i); }); }
         function loadProgressChart(n) {
             const all = getAllWorkoutData();
             const svg = document.getElementById('progress-chart');
@@ -400,8 +401,8 @@
         function drawPieChart(mt) { const cv = document.getElementById('pieChart'), ctx = cv.getContext('2d'), cx = cv.width / 2, cy = cv.height / 2, r = Math.min(cx, cy) - 20, tot = Object.values(mt).reduce((a, b) => a + b, 0); if (tot === 0) { ctx.clearRect(0, 0, cv.width, cv.height); ctx.fillStyle = '#999'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Нет данных', cx, cy); return; } ctx.clearRect(0, 0, cv.width, cv.height); let sa = -Math.PI / 2; muscleNames.forEach((m, i) => { const v = mt[m], ang = (v / tot) * 2 * Math.PI; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, sa, sa + ang); ctx.closePath(); ctx.fillStyle = chartColors[i % chartColors.length]; ctx.fill(); if (v > 0) { const ma = sa + ang / 2, lr = r * 0.65, lx = cx + Math.cos(ma) * lr, ly = cy + Math.sin(ma) * lr, pc = ((v / tot) * 100).toFixed(0); ctx.fillStyle = '#fff'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; if (pc > 5) ctx.fillText(pc + '%', lx, ly); } sa += ang; }); const lg = document.getElementById('chart-legend'); lg.innerHTML = ''; muscleNames.forEach((m, i) => { if (mt[m] > 0) { const it = document.createElement('div'); it.className = 'legend-item'; it.innerHTML = '<div class="legend-color" style="background:' + chartColors[i % chartColors.length] + '"></div><span>' + m + '</span>'; lg.appendChild(it); } }); }
         function loadWorkoutHistory(dates, all) { const c = document.getElementById('workout-history-list'); c.innerHTML = ''; if (!dates.length) { c.innerHTML = '<div class="empty-state"><p>Нет тренировок</p></div>'; return; } let pt = null; dates.forEach(dt => { const dd = all[dt]; let ton = 0, cnt = 0; for (const m in dd) dd[m].forEach(r => { ton += r.weight * r.reps * r.sets; cnt++; }); const dob = parseDate(dt), dw = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'], dm = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'], dh = document.createElement('div'); dh.className = 'workout-date-header'; dh.textContent = dw[dob.getDay()] + ', ' + dob.getDate() + ' ' + dm[dob.getMonth()]; c.appendChild(dh); const cd = document.createElement('div'); cd.className = 'workout-card'; let ch = ''; if (pt !== null && pt > 0) { const df = ((ton - pt) / pt) * 100; if (df > 0) ch = '<div class="workout-comparison positive"><svg class="arrow-up" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg><span>+' + df.toFixed(0) + '%</span></div>'; else if (df < 0) ch = '<div class="workout-comparison negative"><svg class="arrow-down" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg><span>' + df.toFixed(0) + '%</span></div>'; } cd.innerHTML = '<div class="workout-card-header"><span class="workout-card-title">Полный сплит</span><span class="workout-card-tonnage">' + (ton / 1000).toFixed(1) + ' т</span></div><div class="workout-card-stats"><span>' + cnt + ' упражнений</span><span>~' + Math.floor(cnt * 2) + ' мин</span></div>' + ch; c.appendChild(cd); pt = ton; }); }
         let deleteTarget = null;
-        function deleteHistoryItem(btn, date, exercise, muscle) {
-            deleteTarget = { date: date, exercise: exercise, muscle: muscle };
+        function deleteHistoryItem(btn, timestamp) {
+            deleteTarget = { timestamp: timestamp };
             document.getElementById('confirm-overlay').classList.add('active');
         }
         function closeConfirmDialog() {
@@ -410,20 +411,61 @@
         }
         function confirmDelete() {
             if (!deleteTarget) return;
-            const key = 'workout_' + deleteTarget.date;
-            let data = JSON.parse(localStorage.getItem(key)) || {};
-            if (data[deleteTarget.muscle]) {
-                data[deleteTarget.muscle] = data[deleteTarget.muscle].filter(r => !(r.exercise === deleteTarget.exercise && r.date === deleteTarget.date));
-                if (data[deleteTarget.muscle].length === 0) delete data[deleteTarget.muscle];
+            const ts = deleteTarget.timestamp;
+            
+            // Find the record to delete across all dates and muscles
+            let found = false;
+            const allDates = Object.keys(localStorage).filter(k => k.startsWith('workout_'));
+            
+            for (const key of allDates) {
+                let data = JSON.parse(localStorage.getItem(key)) || {};
+                let modified = false;
+                
+                for (const muscle in data) {
+                    if (Array.isArray(data[muscle])) {
+                        const originalLen = data[muscle].length;
+                        data[muscle] = data[muscle].filter(r => {
+                            if (r.timestamp === ts) {
+                                found = true;
+                                return false;
+                            }
+                            return true;
+                        });
+                        if (data[muscle].length === 0) {
+                            delete data[muscle];
+                        }
+                        if (data[muscle].length !== originalLen) {
+                            modified = true;
+                        }
+                    }
+                }
+                
+                if (found) {
+                    if (Object.keys(data).length === 0) {
+                        localStorage.removeItem(key);
+                    } else {
+                        localStorage.setItem(key, JSON.stringify(data));
+                    }
+                    break;
+                }
             }
-            if (Object.keys(data).length === 0) {
-                localStorage.removeItem(key);
-            } else {
-                localStorage.setItem(key, JSON.stringify(data));
-            }
+            
             document.getElementById('confirm-overlay').classList.remove('active');
-            loadExerciseHistory(currentExerciseName);
-            loadProgressChart(currentExerciseName);
+            
+            // Animate and remove the element from DOM immediately
+            const historyList = document.getElementById('exercise-history-list');
+            const itemToDelete = historyList.querySelector(`[data-timestamp="${ts}"]`);
+            if (itemToDelete) {
+                itemToDelete.classList.add('deleting');
+                setTimeout(() => {
+                    loadExerciseHistory(currentExerciseName);
+                    loadProgressChart(currentExerciseName);
+                }, 200);
+            } else {
+                loadExerciseHistory(currentExerciseName);
+                loadProgressChart(currentExerciseName);
+            }
+            
             deleteTarget = null;
         }
         document.addEventListener('DOMContentLoaded', function() { loadProfile(); });
