@@ -67,6 +67,13 @@
         .rest-timer-display { font-size: 80px; font-weight: 900; color: #FF6B35; margin-bottom: 30px; }
         .rest-timer-label { font-size: 24px; color: white; margin-bottom: 40px; font-weight: 700; }
         .btn-skip-rest { background: white; color: #FF6B35; font-size: 20px; font-weight: 900; padding: 20px 40px; border-radius: 15px; border: none; cursor: pointer; text-transform: uppercase; }
+        .timer-choice-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 3001; }
+        .timer-choice-overlay.active { display: flex; }
+        .timer-choice-title { font-size: 24px; color: white; margin-bottom: 30px; font-weight: 700; text-align: center; }
+        .timer-choice-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; padding: 20px; }
+        .btn-timer-choice { background: #FF6B35; color: white; font-size: 20px; font-weight: 900; padding: 20px; border-radius: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); }
+        .btn-timer-choice:active { transform: scale(0.98); background: #E55A2B; }
+        .btn-timer-choice.secondary { background: white; color: #FF6B35; }
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #999; cursor: pointer; padding: 5px 20px; transition: color 0.3s; }
         .nav-item.active { color: #FF6B35; }
@@ -115,6 +122,13 @@
 <body>
     <div class="header"><h1>КАЧОК 105</h1></div>
     <div class="notification" id="notification">Данные сохранены!</div>
+    <div class="timer-choice-overlay" id="timer-choice">
+        <div class="timer-choice-title">Запустить таймер отдыха?</div>
+        <div class="timer-choice-buttons">
+            <button class="btn-timer-choice" onclick="startRestTimerFromChoice()">С таймером</button>
+            <button class="btn-timer-choice secondary" onclick="saveWithoutTimer()">Без таймера</button>
+        </div>
+    </div>
     <div class="rest-timer-overlay" id="rest-timer">
         <div class="rest-timer-display" id="rest-timer-display">90</div>
         <div class="rest-timer-label">Отдых</div>
@@ -303,7 +317,10 @@
         function savePlank() { const t = document.getElementById('plank-time').value, s = document.getElementById('plank-sets').value; if (!t || !s) { alert('Заполните все поля'); return; } saveData(parseInt(t), parseInt(s), 0); }
         function saveBodyweight() { const r = document.getElementById('bw-reps').value, s = document.getElementById('bw-sets').value; if (!r || !s) { alert('Заполните все поля'); return; } saveData(parseInt(r), parseInt(s), 0); }
         function saveExercise() { const w = document.getElementById('ex-weight').value, r = document.getElementById('ex-reps').value, s = document.getElementById('ex-sets').value; if (!w || !r || !s) { alert('Заполните все поля'); return; } saveData(parseInt(r), parseInt(s), parseFloat(w)); }
-        function saveData(reps, sets, weight) { const today = getTodayDate(), key = 'workout_' + today; let data = JSON.parse(localStorage.getItem(key)) || {}; if (!data[currentMuscle]) data[currentMuscle] = []; data[currentMuscle].push({ exercise: currentExerciseName, reps, sets, weight, timestamp: Date.now() }); localStorage.setItem(key, JSON.stringify(data)); showNotification(); startRestTimer(); }
+        function saveData(reps, sets, weight) { const today = getTodayDate(), key = 'workout_' + today; let data = JSON.parse(localStorage.getItem(key)) || {}; if (!data[currentMuscle]) data[currentMuscle] = []; data[currentMuscle].push({ exercise: currentExerciseName, reps, sets, weight, timestamp: Date.now() }); localStorage.setItem(key, JSON.stringify(data)); showNotification(); showTimerChoice(); }
+        function showTimerChoice() { document.getElementById('timer-choice').classList.add('active'); }
+        function startRestTimerFromChoice() { document.getElementById('timer-choice').classList.remove('active'); startRestTimer(); }
+        function saveWithoutTimer() { document.getElementById('timer-choice').classList.remove('active'); }
         function startRestTimer() { let sec = 90; const ov = document.getElementById('rest-timer'), d = document.getElementById('rest-timer-display'); ov.classList.add('active'); d.textContent = sec; restTimerInterval = setInterval(() => { sec--; d.textContent = sec; if (sec <= 0) { clearInterval(restTimerInterval); ov.classList.remove('active'); } }, 1000); }
         function skipRest() { if (restTimerInterval) clearInterval(restTimerInterval); document.getElementById('rest-timer').classList.remove('active'); }
         function showExercisesListFromDetail() { document.getElementById('exercise-detail-screen').classList.remove('active'); document.getElementById('exercises-list-screen').classList.add('active'); }
