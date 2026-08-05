@@ -6,7 +6,7 @@
     <title>КАЧОК 105</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FFF8F0; color: #2D2D2D; min-height: 100vh; padding-bottom: 80px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FFF8F0; color: #2D2D2D; min-height: 100vh; padding-bottom: 150px; }
         .header { background: linear-gradient(135deg, #FFA500 0%, #FF8C00); color: black; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(255, 140, 66, 0.3); }
         .header h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: black; }
         .container { padding: 20px; max-width: 600px; margin: 0 auto; }
@@ -30,6 +30,8 @@
         .gender-option.active { background: #FF6B35; color: white; }
         .btn-save-profile { background: #FF6B35; color: white; font-size: 18px; font-weight: 900; padding: 15px; border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); }
         .btn-save-profile:active { transform: scale(0.98); background: #E55A2B; }
+        .rarity-badge { background: linear-gradient(135deg, #FFA500 0%, #FF8C00); color: black; padding: 15px 20px; border-radius: 15px; margin-top: 20px; margin-bottom: 90px; text-align: center; font-weight: 700; font-size: 14px; line-height: 1.4; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3); display: none; }
+        .rarity-badge.visible { display: block; }
         .progress-chart-container { position: relative; width: 100%; height: 450px; background: white; border-radius: 15px; padding: 15px; padding-bottom: 25px; overflow: visible; }
         .progress-chart { width: 100%; height: 350px; }
         .chart-value-display { text-align: center; padding: 15px; font-size: 16px; font-weight: 700; color: #FF6B35; min-height: 50px; }
@@ -260,6 +262,7 @@
                     <button class="btn-save-profile" onclick="saveProfile()">СОХРАНИТЬ</button>
                 </div>
             </div>
+            <div class="rarity-badge" id="rarity-badge"></div>
         </div>
     </div>
     <nav class="bottom-nav">
@@ -393,9 +396,61 @@
             });
         }
         function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } }
-        function setGender(g) { currentGender = g; document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('active')); document.getElementById('gender-' + g).classList.add('active'); }
-        function loadProfile() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; currentGender = profile.gender || 'male'; document.getElementById('profile-age').value = profile.age || ''; document.getElementById('profile-height').value = profile.height || ''; document.getElementById('profile-weight').value = profile.weight || ''; setGender(currentGender); }
-        function saveProfile() { let profile = { gender: currentGender, age: document.getElementById('profile-age').value, height: document.getElementById('profile-height').value, weight: document.getElementById('profile-weight').value }; localStorage.setItem('user_profile', JSON.stringify(profile)); showNotification(); if (profile.weight) { saveWeight(); } }
+        function setGender(g) { currentGender = g; document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('active')); document.getElementById('gender-' + g).classList.add('active'); updateRarityBadge(); }
+        function loadProfile() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; currentGender = profile.gender || 'male'; document.getElementById('profile-age').value = profile.age || ''; document.getElementById('profile-height').value = profile.height || ''; document.getElementById('profile-weight').value = profile.weight || ''; setGender(currentGender); updateRarityBadge(); }
+        function saveProfile() { let profile = { gender: currentGender, age: document.getElementById('profile-age').value, height: document.getElementById('profile-height').value, weight: document.getElementById('profile-weight').value }; localStorage.setItem('user_profile', JSON.stringify(profile)); showNotification(); if (profile.weight) { saveWeight(); } updateRarityBadge(); }
+        function calculateRarityPercent(gender, height, weight) {
+            const params = {
+                male: { heightMean: 176, heightStd: 7, weightMean: 80, weightStd: 12 },
+                female: { heightMean: 163, weightMean: 67, heightStd: 7, weightStd: 12 }
+            };
+            const p = params[gender];
+            if (!height || !weight) return 50;
+            
+            const zHeight = Math.abs(height - p.heightMean) / p.heightStd;
+            const zWeight = Math.abs(weight - p.weightMean) / p.weightStd;
+            
+            // Combined z-score using root sum of squares
+            const zCombined = Math.sqrt(zHeight * zHeight + zWeight * zWeight);
+            
+            // Convert to percentile using normal distribution approximation
+            // For 2D case, we use chi-squared with 2 degrees of freedom
+            // P(X > x) = exp(-x^2/2) for 2D standard normal
+            let rarity = Math.exp(-(zCombined * zCombined) / 2);
+            
+            // Clamp to reasonable range
+            rarity = Math.max(0.01, Math.min(0.99, rarity));
+            
+            // Round to nice values
+            const niceValues = [1, 3, 5, 10, 15, 20, 25, 30, 40, 50];
+            const percent = rarity * 100;
+            
+            let result = 50;
+            for (const val of niceValues) {
+                if (percent <= val) {
+                    result = val;
+                    break;
+                }
+            }
+            
+            return result;
+        }
+        function updateRarityBadge() {
+            const badge = document.getElementById('rarity-badge');
+            const profile = JSON.parse(localStorage.getItem('user_profile')) || {};
+            const height = parseFloat(profile.height);
+            const weight = parseFloat(profile.weight);
+            const gender = profile.gender || 'male';
+            
+            if (!height || !weight) {
+                badge.classList.remove('visible');
+                return;
+            }
+            
+            const percent = calculateRarityPercent(gender, height, weight);
+            badge.textContent = `С ростом ${height} см и весом ${weight} кг вы среди ${percent}% таких людей на планете`;
+            badge.classList.add('visible');
+        }
         function setPeriod(p) { currentPeriod = p; document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); loadStats(); }
         function loadStats() { const all = getAllWorkoutData(), dates = Object.keys(all).sort((a, b) => parseDate(b) - parseDate(a)), now = new Date(); let fd = []; if (currentPeriod === 'week') fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 7); else if (currentPeriod === '2weeks') fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 14); else fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 30); let total = 0, mt = {}; muscleNames.forEach(m => mt[m] = 0); fd.forEach(dt => { const dd = all[dt]; for (const m in dd) dd[m].forEach(r => { const v = r.weight * r.reps * r.sets; total += v; if (mt[m] !== undefined) mt[m] += v; }); }); document.getElementById('total-tonnage').textContent = (total / 1000).toFixed(1) + ' т'; document.getElementById('total-time').textContent = Math.floor(fd.length * 0.7) + ' ч'; document.getElementById('total-workouts').textContent = fd.length; const bc = document.getElementById('muscle-bars-container'); bc.innerHTML = ''; muscleNames.forEach(m => { const p = total > 0 ? ((mt[m] / total) * 100).toFixed(0) : 0, bi = document.createElement('div'); bi.className = 'muscle-bar-item'; bi.innerHTML = '<div class="muscle-bar-header"><span class="muscle-bar-name">' + m + '</span><span class="muscle-bar-percent">' + p + '%</span></div><div class="muscle-bar-track"><div class="muscle-bar-fill" style="width:' + p + '%"></div></div>'; bc.appendChild(bi); }); drawPieChart(mt); loadWorkoutHistory(fd, all); }
         function drawPieChart(mt) { const cv = document.getElementById('pieChart'), ctx = cv.getContext('2d'), cx = cv.width / 2, cy = cv.height / 2, r = Math.min(cx, cy) - 20, tot = Object.values(mt).reduce((a, b) => a + b, 0); if (tot === 0) { ctx.clearRect(0, 0, cv.width, cv.height); ctx.fillStyle = '#999'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Нет данных', cx, cy); return; } ctx.clearRect(0, 0, cv.width, cv.height); let sa = -Math.PI / 2; muscleNames.forEach((m, i) => { const v = mt[m], ang = (v / tot) * 2 * Math.PI; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, sa, sa + ang); ctx.closePath(); ctx.fillStyle = chartColors[i % chartColors.length]; ctx.fill(); if (v > 0) { const ma = sa + ang / 2, lr = r * 0.65, lx = cx + Math.cos(ma) * lr, ly = cy + Math.sin(ma) * lr, pc = ((v / tot) * 100).toFixed(0); ctx.fillStyle = '#fff'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; if (pc > 5) ctx.fillText(pc + '%', lx, ly); } sa += ang; }); const lg = document.getElementById('chart-legend'); lg.innerHTML = ''; muscleNames.forEach((m, i) => { if (mt[m] > 0) { const it = document.createElement('div'); it.className = 'legend-item'; it.innerHTML = '<div class="legend-color" style="background:' + chartColors[i % chartColors.length] + '"></div><span>' + m + '</span>'; lg.appendChild(it); } }); }
