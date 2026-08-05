@@ -20,16 +20,25 @@
         .muscle-card-img { height: 100%; max-height: 120px; width: auto; object-fit: contain; }
         .weight-section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
         .weight-section h3 { font-size: 18px; color: #FF6B35; margin-bottom: 15px; font-weight: 700; }
-        .weight-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .weight-input-group input { flex: 1; padding: 12px 15px; border: 2px solid #FFE5D0; border-radius: 12px; font-size: 16px; outline: none; background: #FFFAF5; }
-        .weight-input-group input:focus { border-color: #FF8C42; }
-        .weight-current { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid #FFE5D0; margin-top: 10px; }
+        .weight-current { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
         .weight-current-value { font-size: 20px; font-weight: 700; color: #2D2D2D; }
         .weight-change { font-size: 16px; font-weight: 600; }
         .weight-change.positive { color: #4CAF50; }
         .weight-change.negative { color: #F44336; }
         .weight-chart-container { position: relative; margin-top: 15px; width: 100%; height: 100px; }
         .weight-chart { width: 100%; height: 100%; }
+        .profile-section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
+        .profile-section h3 { font-size: 18px; color: #FF6B35; margin-bottom: 15px; font-weight: 700; }
+        .profile-form { display: flex; flex-direction: column; gap: 15px; }
+        .profile-field { display: flex; flex-direction: column; gap: 8px; }
+        .profile-field label { font-size: 14px; color: #666; font-weight: 600; }
+        .profile-field input { width: 100%; padding: 15px; border: 2px solid #FFE5D0; border-radius: 12px; font-size: 18px; font-weight: 700; outline: none; background: #FFFAF5; text-align: center; }
+        .profile-field input:focus { border-color: #FF8C42; }
+        .gender-toggle { display: flex; background: #FFE5D0; border-radius: 12px; padding: 5px; }
+        .gender-option { flex: 1; padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s; }
+        .gender-option.active { background: #FF6B35; color: white; }
+        .btn-save-profile { background: #FF6B35; color: white; font-size: 18px; font-weight: 900; padding: 15px; border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); }
+        .btn-save-profile:active { transform: scale(0.98); background: #E55A2B; }
         .progress-chart-container { position: relative; width: 100%; height: 150px; background: white; border-radius: 15px; padding: 15px; }
         .progress-chart { width: 100%; height: 100%; }
         .chart-tooltip { position: absolute; background: #FF6B35; color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; pointer-events: none; white-space: nowrap; z-index: 1000; display: none; box-shadow: 0 2px 10px rgba(255, 107, 53, 0.4); transform: translate(-50%, -100%); margin-top: -8px; }
@@ -125,10 +134,6 @@
         <div id="home-screen" class="screen active">
             <div class="weight-section">
                 <h3>МОЙ ВЕС</h3>
-                <div class="weight-input-group">
-                    <input type="number" id="weight-input" placeholder="Введите вес (кг)" step="0.1">
-                    <button class="btn btn-primary" style="width: auto; padding: 12px 25px;" onclick="saveWeight()">OK</button>
-                </div>
                 <div class="weight-current" id="weight-current-display" style="display: none;">
                     <span class="weight-current-value" id="current-weight-value">0 кг</span>
                     <span class="weight-change" id="weight-change"></span>
@@ -216,11 +221,42 @@
                 <div class="workout-history"><h3>ИСТОРИЯ ТРЕНИРОВОК</h3><div id="workout-history-list"></div></div>
             </div>
         </div>
+        <div id="profile-screen" class="screen">
+            <div class="profile-section">
+                <h3>ПРОФИЛЬ</h3>
+                <div class="profile-form">
+                    <div class="profile-field">
+                        <label>ПОЛ</label>
+                        <div class="gender-toggle">
+                            <div class="gender-option active" id="gender-male" onclick="setGender('male')">Мужчина</div>
+                            <div class="gender-option" id="gender-female" onclick="setGender('female')">Женщина</div>
+                        </div>
+                    </div>
+                    <div class="profile-field">
+                        <label>ВОЗРАСТ (лет)</label>
+                        <input type="number" id="profile-age" placeholder="25" min="1" max="100">
+                    </div>
+                    <div class="profile-field">
+                        <label>РОСТ (см)</label>
+                        <input type="number" id="profile-height" placeholder="175" min="100" max="250">
+                    </div>
+                    <div class="profile-field">
+                        <label>ВЕС (кг)</label>
+                        <input type="number" id="profile-weight" placeholder="80" min="30" max="200" step="0.1">
+                    </div>
+                    <button class="btn-save-profile" onclick="saveProfile()">СОХРАНИТЬ</button>
+                </div>
+            </div>
+        </div>
     </div>
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTabNav('home')" id="nav-home">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span>Тренировка</span>
+        </div>
+        <div class="nav-item" onclick="switchTabNav('profile')" id="nav-profile">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span>Я</span>
         </div>
         <div class="nav-item" onclick="switchTabNav('stats')" id="nav-stats">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
@@ -269,14 +305,14 @@
         };
         const chartColors = ['#FF6B35', '#FF8C42', '#FFA94D', '#FFC56B', '#FFE08A', '#FFF0A8'];
         const muscleNames = ['Грудь', 'Спина', 'Руки', 'Ноги', 'Плечи', 'Пресс'];
-        let currentMuscle = '', currentExerciseName = '', restTimerInterval = null, currentPeriod = 'week';
+        let currentMuscle = '', currentExerciseName = '', restTimerInterval = null, currentPeriod = 'week', currentGender = 'male';
         const bodyweightExercises = ['Подтягивания', 'Отжимания', 'Скручивания', 'Подъём ног в висе'];
         const plankExercise = 'Планка';
         function showNotification() { const n = document.getElementById('notification'); n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 2000); }
         function getTodayDate() { return new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
         function parseDate(s) { const p = s.split('.'); return new Date(p[2], p[1] - 1, p[0]); }
-        function saveWeight() { const w = parseFloat(document.getElementById('weight-input').value); if (!w || w <= 0) return; const t = getTodayDate(); let weights = JSON.parse(localStorage.getItem('user_weights')) || []; weights.push({ weight: w, date: t, timestamp: Date.now() }); localStorage.setItem('user_weights', JSON.stringify(weights)); document.getElementById('weight-input').value = ''; updateWeightDisplay(); showNotification(); }
-        function updateWeightDisplay() { let weights = JSON.parse(localStorage.getItem('user_weights')) || []; if (weights.length === 0) return; weights.sort((a, b) => b.timestamp - a.timestamp); document.getElementById('weight-current-display').style.display = 'flex'; document.getElementById('current-weight-value').textContent = weights[0].weight + ' кг'; let change = ''; if (weights.length > 1) { const d = weights[0].weight - weights[1].weight; change = (d > 0 ? '+' : '') + d.toFixed(1) + ' кг'; document.getElementById('weight-change').className = 'weight-change ' + (d > 0 ? 'positive' : d < 0 ? 'negative' : ''); } document.getElementById('weight-change').textContent = change; drawWeightChart(weights.slice(0, 10).reverse()); }
+        function saveWeight() { const w = parseFloat(document.getElementById('profile-weight').value); if (!w || w <= 0) return; const t = getTodayDate(); let weights = JSON.parse(localStorage.getItem('user_weights')) || []; weights.push({ weight: w, date: t, timestamp: Date.now() }); localStorage.setItem('user_weights', JSON.stringify(weights)); showNotification(); updateWeightDisplay(); }
+        function updateWeightDisplay() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; let currentWeight = profile.weight ? parseFloat(profile.weight) : null; let weights = JSON.parse(localStorage.getItem('user_weights')) || []; if (currentWeight) { document.getElementById('weight-current-display').style.display = 'flex'; document.getElementById('current-weight-value').textContent = currentWeight + ' кг'; let change = ''; if (weights.length > 0) { const lastWeight = weights[weights.length - 1].weight; const d = currentWeight - lastWeight; if (d !== 0) { change = (d > 0 ? '+' : '') + d.toFixed(1) + ' кг'; document.getElementById('weight-change').className = 'weight-change ' + (d > 0 ? 'positive' : d < 0 ? 'negative' : ''); } } document.getElementById('weight-change').textContent = change; let chartWeights = weights.slice(-9); chartWeights.push({ weight: currentWeight, date: t }); drawWeightChart(chartWeights); } else { document.getElementById('weight-current-display').style.display = 'none'; } }
         function drawWeightChart(w) {
             const svg = document.getElementById('weight-chart');
             const container = document.getElementById('weight-chart-container');
@@ -455,7 +491,10 @@
                 });
             });
         }
-        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); updateWeightDisplay(); } else { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } }
+        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); updateWeightDisplay(); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } }
+        function setGender(g) { currentGender = g; document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('active')); document.getElementById('gender-' + g).classList.add('active'); }
+        function loadProfile() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; currentGender = profile.gender || 'male'; document.getElementById('profile-age').value = profile.age || ''; document.getElementById('profile-height').value = profile.height || ''; document.getElementById('profile-weight').value = profile.weight || ''; setGender(currentGender); }
+        function saveProfile() { let profile = { gender: currentGender, age: document.getElementById('profile-age').value, height: document.getElementById('profile-height').value, weight: document.getElementById('profile-weight').value }; localStorage.setItem('user_profile', JSON.stringify(profile)); showNotification(); if (profile.weight) { saveWeight(); } }
         function setPeriod(p) { currentPeriod = p; document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); loadStats(); }
         function loadStats() { const all = getAllWorkoutData(), dates = Object.keys(all).sort((a, b) => parseDate(b) - parseDate(a)), now = new Date(); let fd = []; if (currentPeriod === 'week') fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 7); else if (currentPeriod === '2weeks') fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 14); else fd = dates.filter(d => (now - parseDate(d)) / 86400000 <= 30); let total = 0, mt = {}; muscleNames.forEach(m => mt[m] = 0); fd.forEach(dt => { const dd = all[dt]; for (const m in dd) dd[m].forEach(r => { const v = r.weight * r.reps * r.sets; total += v; if (mt[m] !== undefined) mt[m] += v; }); }); document.getElementById('total-tonnage').textContent = (total / 1000).toFixed(1) + ' т'; document.getElementById('total-time').textContent = Math.floor(fd.length * 0.7) + ' ч'; document.getElementById('total-workouts').textContent = fd.length; const bc = document.getElementById('muscle-bars-container'); bc.innerHTML = ''; muscleNames.forEach(m => { const p = total > 0 ? ((mt[m] / total) * 100).toFixed(0) : 0, bi = document.createElement('div'); bi.className = 'muscle-bar-item'; bi.innerHTML = '<div class="muscle-bar-header"><span class="muscle-bar-name">' + m + '</span><span class="muscle-bar-percent">' + p + '%</span></div><div class="muscle-bar-track"><div class="muscle-bar-fill" style="width:' + p + '%"></div></div>'; bc.appendChild(bi); }); drawPieChart(mt); loadWorkoutHistory(fd, all); }
         function drawPieChart(mt) { const cv = document.getElementById('pieChart'), ctx = cv.getContext('2d'), cx = cv.width / 2, cy = cv.height / 2, r = Math.min(cx, cy) - 20, tot = Object.values(mt).reduce((a, b) => a + b, 0); if (tot === 0) { ctx.clearRect(0, 0, cv.width, cv.height); ctx.fillStyle = '#999'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Нет данных', cx, cy); return; } ctx.clearRect(0, 0, cv.width, cv.height); let sa = -Math.PI / 2; muscleNames.forEach((m, i) => { const v = mt[m], ang = (v / tot) * 2 * Math.PI; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, sa, sa + ang); ctx.closePath(); ctx.fillStyle = chartColors[i % chartColors.length]; ctx.fill(); if (v > 0) { const ma = sa + ang / 2, lr = r * 0.65, lx = cx + Math.cos(ma) * lr, ly = cy + Math.sin(ma) * lr, pc = ((v / tot) * 100).toFixed(0); ctx.fillStyle = '#fff'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; if (pc > 5) ctx.fillText(pc + '%', lx, ly); } sa += ang; }); const lg = document.getElementById('chart-legend'); lg.innerHTML = ''; muscleNames.forEach((m, i) => { if (mt[m] > 0) { const it = document.createElement('div'); it.className = 'legend-item'; it.innerHTML = '<div class="legend-color" style="background:' + chartColors[i % chartColors.length] + '"></div><span>' + m + '</span>'; lg.appendChild(it); } }); }
@@ -476,7 +515,7 @@
             }
         });
         
-        document.addEventListener('DOMContentLoaded', updateWeightDisplay);
+        document.addEventListener('DOMContentLoaded', function() { loadProfile(); updateWeightDisplay(); });
     </script>
 </body>
 </html>
