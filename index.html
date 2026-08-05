@@ -92,6 +92,19 @@
         .nav-item.active { color: #FF6B35; }
         .nav-icon { width: 24px; height: 24px; fill: currentColor; }
         .nav-item span { font-size: 12px; font-weight: 600; white-space: normal; text-align: center; line-height: 1.2; }
+        .emotions-container { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; }
+        .emotions-title { font-size: 20px; color: #FF6B35; font-weight: 700; margin-bottom: 30px; line-height: 1.3; }
+        .stars-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .star-btn { background: none; border: none; cursor: pointer; padding: 10px; transition: transform 0.2s; }
+        .star-btn:active { transform: scale(0.9); }
+        .star-icon { width: 50px; height: 50px; fill: #FFE5D0; transition: fill 0.2s; }
+        .star-icon.filled { fill: #FFA500; }
+        .emotion-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 5000; }
+        .emotion-modal-overlay.active { display: flex; }
+        .emotion-modal { background: white; border-radius: 20px; padding: 30px; max-width: 350px; width: 90%; text-align: center; }
+        .emotion-modal-text { font-size: 18px; color: #2D2D2D; font-weight: 600; line-height: 1.5; margin-bottom: 25px; }
+        .emotion-modal-close { background: #FF6B35; color: white; font-size: 16px; font-weight: 900; padding: 15px 40px; border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; min-height: 48px; }
+        .emotion-modal-close:active { transform: scale(0.98); background: #E55A2B; }
         .stats-container { display: flex; flex-direction: column; gap: 20px; }
         .period-switcher { display: flex; background: white; border-radius: 15px; padding: 5px; margin-bottom: 20px; }
         .period-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; border-radius: 10px; transition: all 0.3s; min-height: 44px; white-space: nowrap; }
@@ -276,6 +289,24 @@
             </div>
             <div class="rarity-badge" id="rarity-badge"></div>
         </div>
+        <div id="emotions-screen" class="screen">
+            <div class="emotions-container">
+                <div class="emotions-title">Как прошла тренировка? Оцени от 1 до 5</div>
+                <div class="stars-container">
+                    <button class="star-btn" onclick="selectStar(1)"><svg class="star-icon" id="star-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(2)"><svg class="star-icon" id="star-2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(3)"><svg class="star-icon" id="star-3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(4)"><svg class="star-icon" id="star-4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectStar(5)"><svg class="star-icon" id="star-5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                </div>
+            </div>
+        </div>
+        <div class="emotion-modal-overlay" id="emotion-modal-overlay">
+            <div class="emotion-modal">
+                <div class="emotion-modal-text" id="emotion-modal-text"></div>
+                <button class="emotion-modal-close" onclick="closeEmotionModal()">Закрыть</button>
+            </div>
+        </div>
     </div>
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTabNav('home')" id="nav-home">
@@ -289,6 +320,10 @@
         <div class="nav-item" onclick="switchTabNav('stats')" id="nav-stats">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
             <span>Прогресс</span>
+        </div>
+        <div class="nav-item" onclick="switchTabNav('emotions')" id="nav-emotions">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-4-8c.83 0 1.5-.67 1.5-1.5S8.83 9 8 9 6.5 9.67 6.5 10.5 7.17 12 8 12zm8 0c.83 0 1.5-.67 1.5-1.5S16.83 9 16 9s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-4 4c2.21 0 4-1.79 4-4h-8c0 2.21 1.79 4 4 4z"/></svg>
+            <span>Эмоции</span>
         </div>
     </nav>
     <script>
@@ -407,7 +442,7 @@
                 });
             });
         }
-        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } }
+        function switchTabNav(t) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); if (t === 'home') { document.getElementById('nav-home').classList.add('active'); document.getElementById('home-screen').classList.add('active'); } else if (t === 'profile') { document.getElementById('nav-profile').classList.add('active'); document.getElementById('profile-screen').classList.add('active'); loadProfile(); } else if (t === 'stats') { document.getElementById('nav-stats').classList.add('active'); document.getElementById('stats-screen').classList.add('active'); loadStats(); } else if (t === 'emotions') { document.getElementById('nav-emotions').classList.add('active'); document.getElementById('emotions-screen').classList.add('active'); resetStars(); } }
         function setGender(g) { currentGender = g; document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('active')); document.getElementById('gender-' + g).classList.add('active'); updateRarityBadge(); }
         function loadProfile() { let profile = JSON.parse(localStorage.getItem('user_profile')) || {}; currentGender = profile.gender || 'male'; document.getElementById('profile-age').value = profile.age || ''; document.getElementById('profile-height').value = profile.height || ''; document.getElementById('profile-weight').value = profile.weight || ''; setGender(currentGender); updateRarityBadge(); }
         function saveProfile() { let profile = { gender: currentGender, age: document.getElementById('profile-age').value, height: document.getElementById('profile-height').value, weight: document.getElementById('profile-weight').value }; localStorage.setItem('user_profile', JSON.stringify(profile)); showNotification(); if (profile.weight) { saveWeight(); } updateRarityBadge(); }
@@ -535,6 +570,48 @@
             
             deleteTarget = null;
         }
+        
+        const emotionTexts = {
+            1: 'Тренировка была сложной, но ты справился! Это уже победа. Каждый шаг вперёд важен, даже если он маленький. Ты молодец!',
+            2: 'Хорошая работа! Сегодня было непросто, но ты не сдался. Продолжай в том же духе, прогресс обязательно придёт.',
+            3: 'Хорошо, уверенный прогресс! Ты двигаешься в правильном направлении. Так держать!',
+            4: 'Отличная тренировка! Ты показал настоящий характер. Горжусь твоими результатами!',
+            5: 'Восхитительно! Ты выложился на полную! Это была мощная тренировка, так держать чемпион!'
+        };
+        
+        function selectStar(rating) {
+            for (let i = 1; i <= 5; i++) {
+                const star = document.getElementById('star-' + i);
+                if (i <= rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            }
+            
+            const text = emotionTexts[rating];
+            document.getElementById('emotion-modal-text').textContent = text;
+            document.getElementById('emotion-modal-overlay').classList.add('active');
+            
+            const now = new Date();
+            const dateStr = now.toISOString();
+            const entry = { rating: rating, date: dateStr };
+            
+            let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
+            emotions.push(entry);
+            localStorage.setItem('emotions_history', JSON.stringify(emotions));
+        }
+        
+        function closeEmotionModal() {
+            document.getElementById('emotion-modal-overlay').classList.remove('active');
+        }
+        
+        function resetStars() {
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('star-' + i).classList.remove('filled');
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() { loadProfile(); });
     </script>
 </body>
