@@ -30,9 +30,9 @@
         .gender-option.active { background: #FF6B35; color: white; }
         .btn-save-profile { background: #FF6B35; color: white; font-size: 18px; font-weight: 900; padding: 15px; border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4); }
         .btn-save-profile:active { transform: scale(0.98); background: #E55A2B; }
-        .progress-chart-container { position: relative; width: 100%; height: 150px; background: white; border-radius: 15px; padding: 15px; }
+        .progress-chart-container { position: relative; width: 100%; height: 150px; background: white; border-radius: 15px; padding: 15px; overflow: hidden; }
         .progress-chart { width: 100%; height: 100%; }
-        .chart-tooltip { position: absolute; background: #FF6B35; color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; pointer-events: none; white-space: nowrap; z-index: 1000; display: none; box-shadow: 0 2px 10px rgba(255, 107, 53, 0.4); transform: translate(-50%, -100%); margin-top: -8px; }
+        .chart-tooltip { position: absolute; background: #FF6B35; color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; pointer-events: none; white-space: nowrap; z-index: 1000; display: none; box-shadow: 0 2px 10px rgba(255, 107, 53, 0.4); }
         .chart-point { cursor: pointer; }
         .exercise-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .exercise-list-header h2 { color: #FF6B35; font-size: 24px; font-weight: 700; }
@@ -356,44 +356,24 @@
                         delete tooltip.dataset.activePoint;
                         return;
                     }
+
+                    // Get container bounding rect
+                    const containerRect = container.getBoundingClientRect();
                     
-                    // Calculate position in SVG coordinates, then convert to container percentage
-                    const containerWidth = container.clientWidth;
-                    const containerHeight = container.clientHeight;
+                    // Calculate scale factors (SVG coordinates to screen pixels)
+                    const scaleX = containerRect.width / W;
+                    const scaleY = containerRect.height / H;
                     
-                    // Position tooltip above the point in container coordinates
-                    const tooltipXPercent = (cx / W) * 100;
-                    const tooltipYPercent = (cy / H) * 100;
+                    // Calculate point position relative to container
+                    const pointX = cx * scaleX;
+                    const pointY = cy * scaleY;
                     
                     tooltip.textContent = weight + ' кг, ' + date;
-                    tooltip.style.left = tooltipXPercent + '%';
-                    tooltip.style.top = tooltipYPercent + '%';
-                    tooltip.style.transform = 'translate(-50%, -100%)';
+                    tooltip.style.left = pointX + 'px';
+                    tooltip.style.top = pointY + 'px';
+                    tooltip.style.transform = 'translate(-50%, -120%)';
                     tooltip.style.display = 'block';
                     tooltip.dataset.activePoint = weight + '-' + date;
-                    
-                    // Boundary check - adjust position if tooltip overflows
-                    setTimeout(() => {
-                        const tooltipRect = tooltip.getBoundingClientRect();
-                        const containerRect = container.getBoundingClientRect();
-                        
-                        // Calculate overflow in pixels
-                        const overflowLeft = containerRect.left - (tooltipRect.left);
-                        const overflowRight = tooltipRect.right - containerRect.right;
-                        
-                        // Adjust transform based on overflow
-                        if (overflowRight > 0) {
-                            // Tooltip goes beyond right edge - shift left
-                            const shiftPercent = (overflowRight / containerWidth) * 100;
-                            tooltip.style.transform = 'translate(calc(-50% - ' + shiftPercent + '%), -100%)';
-                        } else if (overflowLeft > 0) {
-                            // Tooltip goes beyond left edge - shift right
-                            const shiftPercent = (overflowLeft / containerWidth) * 100;
-                            tooltip.style.transform = 'translate(calc(-50% + ' + shiftPercent + '%), -100%)';
-                        } else {
-                            tooltip.style.transform = 'translate(-50%, -100%)';
-                        }
-                    }, 0);
                 });
             });
         }
