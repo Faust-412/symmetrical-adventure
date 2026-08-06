@@ -99,6 +99,9 @@
         .star-btn:active { transform: scale(0.9); }
         .star-icon { width: 50px; height: 50px; fill: #FFE5D0; transition: fill 0.2s; }
         .star-icon.filled { fill: #FFA500; }
+        .tag-btn { background: #FFE5D0; color: #666; border: none; border-radius: 20px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; min-height: 40px; }
+        .tag-btn:active { transform: scale(0.95); }
+        .tag-btn.selected { background: #FF6B35; color: white; }
         .emotion-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 5000; }
         .emotion-modal-overlay.active { display: flex; }
         .emotion-modal { background: white; border-radius: 20px; padding: 30px; max-width: 350px; width: 90%; text-align: center; }
@@ -371,16 +374,47 @@
         </div>
         <div id="emotions-screen" class="screen">
             <div class="emotions-container">
-                <div class="emotions-title">Как прошла тренировка? Оцени от 1 до 5</div>
-                <div class="stars-container">
-                    <button class="star-btn" onclick="selectStar(1)" id="star-btn-1"><svg class="star-icon" id="star-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(2)" id="star-btn-2"><svg class="star-icon" id="star-2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(3)" id="star-btn-3"><svg class="star-icon" id="star-3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(4)" id="star-btn-4"><svg class="star-icon" id="star-4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                    <button class="star-btn" onclick="selectStar(5)" id="star-btn-5"><svg class="star-icon" id="star-5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                <div class="emotions-title">Настроение ДО тренировки</div>
+                <div class="stars-container" id="before-stars-container">
+                    <button class="star-btn" onclick="selectBeforeStar(1)" id="before-star-btn-1"><svg class="star-icon" id="before-star-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectBeforeStar(2)" id="before-star-btn-2"><svg class="star-icon" id="before-star-2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectBeforeStar(3)" id="before-star-btn-3"><svg class="star-icon" id="before-star-3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectBeforeStar(4)" id="before-star-btn-4"><svg class="star-icon" id="before-star-4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectBeforeStar(5)" id="before-star-btn-5"><svg class="star-icon" id="before-star-5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
                 </div>
+                
+                <div class="emotions-title" style="margin-top: 30px;">Настроение ПОСЛЕ тренировки</div>
+                <div class="stars-container" id="after-stars-container">
+                    <button class="star-btn" onclick="selectAfterStar(1)" id="after-star-btn-1"><svg class="star-icon" id="after-star-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectAfterStar(2)" id="after-star-btn-2"><svg class="star-icon" id="after-star-2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectAfterStar(3)" id="after-star-btn-3"><svg class="star-icon" id="after-star-3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectAfterStar(4)" id="after-star-btn-4"><svg class="star-icon" id="after-star-4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    <button class="star-btn" onclick="selectAfterStar(5)" id="after-star-btn-5"><svg class="star-icon" id="after-star-5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                </div>
+                
+                <div id="mood-difference-block" style="margin-top: 20px; padding: 15px; background: #FFF8F0; border-radius: 12px; display: none;">
+                    <div id="mood-difference-text" style="font-size: 16px; font-weight: 700; color: #FF6B35;"></div>
+                </div>
+                
+                <div id="tags-section" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #FFE5D0; display: none;">
+                    <div style="font-size: 16px; color: #666; margin-bottom: 15px; font-weight: 600;">Теги дня:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;" id="tags-container">
+                        <button class="tag-btn" data-tag="ПАМП" id="tag-ПАМП">ПАМП</button>
+                        <button class="tag-btn" data-tag="РЕКОРД" id="tag-РЕКОРД">РЕКОРД</button>
+                        <button class="tag-btn" data-tag="ТЯЖЕЛО" id="tag-ТЯЖЕЛО">ТЯЖЕЛО</button>
+                        <button class="tag-btn" data-tag="ЛЕГКО" id="tag-ЛЕГКО">ЛЕГКО</button>
+                        <button class="tag-btn" data-tag="НЕ ВЫСПАЛСЯ" id="tag-НЕ ВЫСПАЛСЯ">НЕ ВЫСПАЛСЯ</button>
+                        <button class="tag-btn" data-tag="ЗЛОЙ" id="tag-ЗЛОЙ">ЗЛОЙ</button>
+                    </div>
+                </div>
+                
+                <div id="week-analysis-block" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #FFE5D0;">
+                    <div style="font-size: 18px; color: #666; margin-bottom: 15px; font-weight: 700;">Анализ недели:</div>
+                    <div id="week-analysis-result" style="font-size: 16px; color: #2D2D2D; line-height: 1.5;"></div>
+                </div>
+                
                 <div id="average-rating-block" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #FFE5D0;">
-                    <div style="font-size: 18px; color: #666; margin-bottom: 10px;">Средняя оценка:</div>
+                    <div style="font-size: 18px; color: #666; margin-bottom: 10px;">Средняя оценка (после):</div>
                     <div id="average-rating-value" style="font-size: 48px; font-weight: 900; color: #FF6B35;">-</div>
                 </div>
             </div>
@@ -817,9 +851,52 @@
             return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
         }
         
+        function getDayOfWeekName(dateStr) {
+            const days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+            const date = new Date(dateStr);
+            return days[date.getDay()];
+        }
+        
+        function calculateWeekAnalysis() {
+            const emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
+            const dayNames = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+            const dayTotals = [0, 0, 0, 0, 0, 0, 0];
+            const dayCounts = [0, 0, 0, 0, 0, 0, 0];
+            
+            emotions.forEach(function(entry) {
+                if (entry.afterRating !== undefined) {
+                    const date = new Date(entry.date);
+                    const dayIndex = date.getDay();
+                    dayTotals[dayIndex] += entry.afterRating;
+                    dayCounts[dayIndex]++;
+                }
+            });
+            
+            const dayAverages = [];
+            for (let i = 0; i < 7; i++) {
+                if (dayCounts[i] > 0) {
+                    dayAverages.push({ day: i, name: dayNames[i], avg: dayTotals[i] / dayCounts[i], count: dayCounts[i] });
+                }
+            }
+            
+            const resultDiv = document.getElementById('week-analysis-result');
+            if (dayAverages.length < 3) {
+                resultDiv.textContent = 'Собери ещё немного данных для анализа';
+                return;
+            }
+            
+            dayAverages.sort((a, b) => b.avg - a.avg);
+            const bestDay = dayAverages[0];
+            const worstDay = dayAverages[dayAverages.length - 1];
+            
+            resultDiv.innerHTML = 'Твой лучший день — <strong>' + bestDay.name + '</strong> (средняя оценка ' + bestDay.avg.toFixed(1).replace('.', ',') + ')<br>Худший день — <strong>' + worstDay.name + '</strong> (средняя оценка ' + worstDay.avg.toFixed(1).replace('.', ',') + ')';
+        }
+        
         function calculateAverageRating() {
             let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
-            if (emotions.length === 0) {
+            const afterRatings = emotions.filter(e => e.afterRating !== undefined);
+            
+            if (afterRatings.length === 0) {
                 document.getElementById('average-rating-value').textContent = '-';
                 return;
             }
@@ -827,10 +904,10 @@
             const today = getTodayDateString();
             const dailyRatings = {};
             
-            emotions.forEach(function(entry) {
+            afterRatings.forEach(function(entry) {
                 const entryDate = entry.date.substring(0, 10);
                 if (!dailyRatings[entryDate]) {
-                    dailyRatings[entryDate] = entry.rating;
+                    dailyRatings[entryDate] = entry.afterRating;
                 }
             });
             
@@ -847,46 +924,173 @@
             const today = getTodayDateString();
             let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
             
+            let todayEntry = null;
             for (let i = 0; i < emotions.length; i++) {
                 const entry = emotions[i];
                 const entryDate = entry.date.substring(0, 10);
                 if (entryDate === today) {
-                    const rating = entry.rating;
-                    for (let j = 1; j <= 5; j++) {
-                        const star = document.getElementById('star-' + j);
-                        if (j <= rating) {
-                            star.classList.add('filled');
-                        } else {
-                            star.classList.remove('filled');
-                        }
-                    }
-                    
-                    for (let k = 1; k <= 5; k++) {
-                        const btn = document.getElementById('star-btn-' + k);
-                        btn.style.pointerEvents = 'none';
-                        btn.style.cursor = 'default';
-                    }
+                    todayEntry = entry;
                     break;
                 }
             }
             
+            const beforeStarsDisabled = todayEntry && todayEntry.beforeRating !== undefined;
+            const afterStarsDisabled = todayEntry && todayEntry.afterRating !== undefined;
+            
+            for (let j = 1; j <= 5; j++) {
+                const beforeStar = document.getElementById('before-star-' + j);
+                const afterStar = document.getElementById('after-star-' + j);
+                
+                if (todayEntry && todayEntry.beforeRating !== undefined && j <= todayEntry.beforeRating) {
+                    beforeStar.classList.add('filled');
+                } else {
+                    beforeStar.classList.remove('filled');
+                }
+                
+                if (todayEntry && todayEntry.afterRating !== undefined && j <= todayEntry.afterRating) {
+                    afterStar.classList.add('filled');
+                } else {
+                    afterStar.classList.remove('filled');
+                }
+            }
+            
+            for (let k = 1; k <= 5; k++) {
+                const beforeBtn = document.getElementById('before-star-btn-' + k);
+                const afterBtn = document.getElementById('after-star-btn-' + k);
+                
+                if (beforeStarsDisabled) {
+                    beforeBtn.style.pointerEvents = 'none';
+                    beforeBtn.style.cursor = 'default';
+                } else {
+                    beforeBtn.style.pointerEvents = 'auto';
+                    beforeBtn.style.cursor = 'pointer';
+                }
+                
+                if (afterStarsDisabled) {
+                    afterBtn.style.pointerEvents = 'none';
+                    afterBtn.style.cursor = 'default';
+                } else {
+                    afterBtn.style.pointerEvents = 'auto';
+                    afterBtn.style.cursor = 'pointer';
+                }
+            }
+            
+            if (todayEntry && todayEntry.beforeRating !== undefined && todayEntry.afterRating !== undefined) {
+                const diff = todayEntry.afterRating - todayEntry.beforeRating;
+                const diffBlock = document.getElementById('mood-difference-block');
+                const diffText = document.getElementById('mood-difference-text');
+                diffBlock.style.display = 'block';
+                
+                if (diff > 0) {
+                    diffText.textContent = 'Настроение после тренировки +' + diff + ' ⭐. Железо работает.';
+                } else if (diff === 0) {
+                    diffText.textContent = 'Настроение не изменилось. Стабильность — признак мастерства.';
+                } else {
+                    diffText.textContent = 'Настроение снизилось на ' + Math.abs(diff) + ' ⭐. Бывает, главное — не сдаваться.';
+                }
+                
+                document.getElementById('tags-section').style.display = 'block';
+                
+                const tagsContainer = document.getElementById('tags-container');
+                const allTagBtns = tagsContainer.querySelectorAll('.tag-btn');
+                allTagBtns.forEach(btn => btn.classList.remove('selected'));
+                
+                if (todayEntry.tags && todayEntry.tags.length > 0) {
+                    todayEntry.tags.forEach(tag => {
+                        const tagBtn = document.getElementById('tag-' + tag);
+                        if (tagBtn) tagBtn.classList.add('selected');
+                    });
+                }
+                
+                allTagBtns.forEach(btn => {
+                    btn.onclick = function() {
+                        const tag = this.getAttribute('data-tag');
+                        toggleTag(tag);
+                    };
+                });
+            } else {
+                document.getElementById('mood-difference-block').style.display = 'none';
+                document.getElementById('tags-section').style.display = 'none';
+            }
+            
             calculateAverageRating();
+            calculateWeekAnalysis();
         }
         
-        function selectStar(rating) {
+        function selectBeforeStar(rating) {
             const today = getTodayDateString();
             let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
             
+            let todayEntry = null;
+            let todayIndex = -1;
             for (let i = 0; i < emotions.length; i++) {
                 const entry = emotions[i];
                 const entryDate = entry.date.substring(0, 10);
                 if (entryDate === today) {
-                    return;
+                    todayEntry = entry;
+                    todayIndex = i;
+                    break;
                 }
             }
             
+            if (todayEntry && todayEntry.beforeRating !== undefined) {
+                return;
+            }
+            
             for (let i = 1; i <= 5; i++) {
-                const star = document.getElementById('star-' + i);
+                const star = document.getElementById('before-star-' + i);
+                if (i <= rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            }
+            
+            const now = new Date();
+            const dateStr = now.toISOString();
+            
+            if (todayEntry) {
+                todayEntry.beforeRating = rating;
+                todayEntry.date = dateStr;
+                emotions[todayIndex] = todayEntry;
+            } else {
+                const entry = { beforeRating: rating, date: dateStr };
+                emotions.push(entry);
+            }
+            
+            localStorage.setItem('emotions_history', JSON.stringify(emotions));
+            
+            for (let k = 1; k <= 5; k++) {
+                const btn = document.getElementById('before-star-btn-' + k);
+                btn.style.pointerEvents = 'none';
+                btn.style.cursor = 'default';
+            }
+            
+            loadEmotionsScreen();
+        }
+        
+        function selectAfterStar(rating) {
+            const today = getTodayDateString();
+            let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
+            
+            let todayEntry = null;
+            let todayIndex = -1;
+            for (let i = 0; i < emotions.length; i++) {
+                const entry = emotions[i];
+                const entryDate = entry.date.substring(0, 10);
+                if (entryDate === today) {
+                    todayEntry = entry;
+                    todayIndex = i;
+                    break;
+                }
+            }
+            
+            if (todayEntry && todayEntry.afterRating !== undefined) {
+                return;
+            }
+            
+            for (let i = 1; i <= 5; i++) {
+                const star = document.getElementById('after-star-' + i);
                 if (i <= rating) {
                     star.classList.add('filled');
                 } else {
@@ -900,32 +1104,64 @@
             
             const now = new Date();
             const dateStr = now.toISOString();
-            const entry = { rating: rating, date: dateStr };
             
-            emotions.push(entry);
+            if (todayEntry) {
+                todayEntry.afterRating = rating;
+                todayEntry.date = dateStr;
+                emotions[todayIndex] = todayEntry;
+            } else {
+                const entry = { afterRating: rating, date: dateStr };
+                emotions.push(entry);
+            }
+            
             localStorage.setItem('emotions_history', JSON.stringify(emotions));
             
             for (let k = 1; k <= 5; k++) {
-                const btn = document.getElementById('star-btn-' + k);
+                const btn = document.getElementById('after-star-btn-' + k);
                 btn.style.pointerEvents = 'none';
                 btn.style.cursor = 'default';
             }
             
-            calculateAverageRating();
+            loadEmotionsScreen();
+        }
+        
+        function toggleTag(tag) {
+            const today = getTodayDateString();
+            let emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
+            
+            let todayEntry = null;
+            let todayIndex = -1;
+            for (let i = 0; i < emotions.length; i++) {
+                const entry = emotions[i];
+                const entryDate = entry.date.substring(0, 10);
+                if (entryDate === today) {
+                    todayEntry = entry;
+                    todayIndex = i;
+                    break;
+                }
+            }
+            
+            if (!todayEntry) return;
+            
+            if (!todayEntry.tags) {
+                todayEntry.tags = [];
+            }
+            
+            const tagIndex = todayEntry.tags.indexOf(tag);
+            if (tagIndex > -1) {
+                todayEntry.tags.splice(tagIndex, 1);
+            } else {
+                todayEntry.tags.push(tag);
+            }
+            
+            emotions[todayIndex] = todayEntry;
+            localStorage.setItem('emotions_history', JSON.stringify(emotions));
+            
+            loadEmotionsScreen();
         }
         
         function closeEmotionModal() {
             document.getElementById('emotion-modal-overlay').classList.remove('active');
-        }
-        
-        function resetStars() {
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById('star-' + i).classList.remove('filled');
-                const btn = document.getElementById('star-btn-' + i);
-                btn.style.pointerEvents = 'auto';
-                btn.style.cursor = 'pointer';
-            }
-            loadEmotionsScreen();
         }
         
         let currentCalendarDate = new Date();
@@ -1008,17 +1244,27 @@
                 }
                 
                 let emotionStars = '';
+                let tagsHtml = '';
                 if (hasEmotion) {
                     const emotions = JSON.parse(localStorage.getItem('emotions_history')) || [];
                     const emotionEntry = emotions.find(e => e.date.substring(0, 10) === dateStr);
                     if (emotionEntry) {
-                        for (let i = 0; i < emotionEntry.rating; i++) {
+                        const rating = emotionEntry.afterRating !== undefined ? emotionEntry.afterRating : emotionEntry.rating;
+                        for (let i = 0; i < rating; i++) {
                             emotionStars += '★';
+                        }
+                        
+                        if (emotionEntry.tags && emotionEntry.tags.length > 0) {
+                            tagsHtml = '<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 15px;">';
+                            emotionEntry.tags.forEach(tag => {
+                                tagsHtml += '<span style="background: #FF6B35; color: white; padding: 6px 14px; border-radius: 15px; font-size: 12px; font-weight: 700;">' + tag + '</span>';
+                            });
+                            tagsHtml += '</div>';
                         }
                     }
                 }
                 
-                modalContent.innerHTML = '<div class="emotion-modal-text" style="margin-bottom: 15px;">Тренировка: ' + musclesTrained.join(', ') + '</div>' + (emotionStars ? '<div class="emotion-modal-text" style="color: #FFA500; font-size: 24px; margin-bottom: 20px;">' + emotionStars + '</div>' : '') + '<button class="emotion-modal-close" onclick="closeDayModal()">Закрыть</button>';
+                modalContent.innerHTML = '<div class="emotion-modal-text" style="margin-bottom: 15px;">Тренировка: ' + musclesTrained.join(', ') + '</div>' + (emotionStars ? '<div class="emotion-modal-text" style="color: #FFA500; font-size: 24px; margin-bottom: 10px;">' + emotionStars + '</div>' : '') + tagsHtml + '<button class="emotion-modal-close" onclick="closeDayModal()" style="margin-top: 20px;">Закрыть</button>';
             }
             
             modalOverlay.classList.add('active');
