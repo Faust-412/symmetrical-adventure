@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>КАЧОК 105</title>
     <style>
+        :root { --header-orange: #F09737; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FFF8F0; color: #2D2D2D; min-height: 100vh; padding-bottom: 150px; font-size: 16px; }
         .header { background: linear-gradient(135deg, #FFA500 0%, #FF8C00); color: black; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(255, 140, 66, 0.3); }
-        .header h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: black; }
+        .header h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: var(--header-orange); }
         .container { padding: 20px; max-width: 600px; margin: 0 auto; width: 100%; }
         .screen { display: none; }
         .screen.active { display: block; }
         .muscle-grid { display: flex; flex-direction: column; gap: 15px; }
         .muscle-card { background: #1a1a1a; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; min-height: 100px; position: relative; }
         .muscle-card:active { transform: scale(0.98); border-color: #FF6B35; background: #2a2a2a; }
-        .muscle-card-title { font-size: 32px; color: rgb(240, 151, 55); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-left: 30px; width: 55%; text-align: left; align-self: center; white-space: normal; word-wrap: break-word; line-height: 1.2; pointer-events: none; user-select: none; }
+        .muscle-card-title { font-size: 32px; color: var(--header-orange); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-left: 30px; width: 55%; text-align: left; align-self: center; white-space: normal; word-wrap: break-word; line-height: 1.2; pointer-events: none; user-select: none; }
         .muscle-card-svg { width: 80px; height: 80px; object-fit: contain; pointer-events: none; user-select: none; flex-shrink: 0; }
         .muscle-card-img { height: 100%; max-height: 120px; width: auto; object-fit: contain; pointer-events: none; user-select: none; }
         .profile-section { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.1); }
@@ -149,7 +150,7 @@
         .notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .achievements-btn-card { background: linear-gradient(135deg, #FFA500 0%, #FF8C00); border-radius: 20px; padding: 20px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; min-height: 80px; }
         .achievements-btn-card:active { transform: scale(0.98); background: linear-gradient(135deg, #FF8C00 0%, #FF6B35); }
-        .achievements-btn-text { color: black; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+        .achievements-btn-text { color: var(--header-orange); font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
         .achievements-screen { display: none; }
         .achievements-screen.active { display: block; }
         .achievements-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 20px 0; }
